@@ -11,6 +11,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.nrg948.dashboard.annotations.DashboardDefinition;
 import com.nrg948.dashboard.annotations.DashboardLayout;
+import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.LabelPosition;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -67,6 +68,17 @@ public class Swerve extends SubsystemBase implements ActiveSubsystem {
               RobotSelector.CompetitionRobot2026, SwerveDriveParameters.CompetitionBase2026,
               RobotSelector.AlphaRobot2026, SwerveDriveParameters.AlphaBase2026),
           SwerveDriveParameters.CompetitionBase2026);
+
+  @DashboardTextDisplay(title = "Max Velocity (m/s)", row = 0, column = 4, height = 1, width = 2)
+  public static final double MAX_VELOCITY = PARAMETERS.getMaxDriveSpeed();
+
+  @DashboardTextDisplay(
+      title = "Max Acceleration (m/s^2)",
+      row = 1,
+      column = 4,
+      height = 1,
+      width = 2)
+  public static final double MAX_ACCELERATION = PARAMETERS.getMaxDriveAcceleration();
 
   public static final double ROTATIONAL_KP = 1.0;
   public static final double DRIVE_KP = 1.0;

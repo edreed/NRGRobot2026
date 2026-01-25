@@ -235,7 +235,31 @@
           }
         } ]
       } ],
-      "containers" : [ ]
+      "containers" : [ {
+        "title" : "Max Velocity (m/s)",
+        "type" : "Text Display",
+        "x" : 512.0,
+        "y" : 0.0,
+        "width" : 256.0,
+        "height" : 128.0,
+        "properties" : {
+          "topic" : "/SmartDashboard/Swerve/Max Velocity (m+s)",
+          "period" : 0.06,
+          "show_submit_button" : false
+        }
+      }, {
+        "title" : "Max Acceleration (m/s^2)",
+        "type" : "Text Display",
+        "x" : 512.0,
+        "y" : 128.0,
+        "width" : 256.0,
+        "height" : 128.0,
+        "properties" : {
+          "topic" : "/SmartDashboard/Swerve/Max Acceleration (m+s^2)",
+          "period" : 0.06,
+          "show_submit_button" : false
+        }
+      } ]
     }
   }, {
     "name" : "Intake",
