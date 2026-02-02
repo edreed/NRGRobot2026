@@ -24,7 +24,7 @@ import frc.robot.commands.LEDCommands;
 import frc.robot.commands.ShootingCommands;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.Subsystems;
-import frc.robot.util.MatchTime;
+import frc.robot.util.MatchUtil;
 import frc.robot.util.MotorIdleMode;
 
 /**
@@ -41,15 +41,21 @@ public class RobotContainer {
   private final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-  @DashboardTab(title = "Operator")
+  @DashboardTab(
+      title = "Operator",
+      modes = {"Competition", "Testing"})
   private final RobotOperator operator;
 
-  @DashboardTab(title = "Preferences")
+  @DashboardTab(
+      title = "Preferences",
+      modes = {"Competition", "Testing"})
   private final RobotPreferences preferences = new RobotPreferences();
 
   private final Subsystems subsystems = new Subsystems();
 
-  @DashboardTab(title = "Autonomous")
+  @DashboardTab(
+      title = "Autonomous",
+      modes = {"Competition", "Testing"})
   private final Autos autos = new Autos(subsystems);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -80,14 +86,14 @@ public class RobotContainer {
 
     driverController.start().onTrue(DriveCommands.resetOrientation(subsystems));
 
-    new Trigger(MatchTime::isAutonomous).whileTrue(LEDCommands.autoLEDs(subsystems));
-    new Trigger(MatchTime::isNearShiftChangeExcludingFinalSecond)
+    new Trigger(MatchUtil::isAutonomous).whileTrue(LEDCommands.autoLEDs(subsystems));
+    new Trigger(MatchUtil::isNearShiftChangeExcludingFinalSecond)
         .whileTrue(LEDCommands.setTransitionModeLED(subsystems));
-    new Trigger(MatchTime::isNearShiftChangeFinalSecond)
+    new Trigger(MatchUtil::isNearShiftChangeFinalSecond)
         .whileTrue(LEDCommands.setLastSecondTransitionModeLED(subsystems));
-    new Trigger(MatchTime::isNearEndgame)
+    new Trigger(MatchUtil::isNearEndgame)
         .whileTrue(LEDCommands.transitionToEndgameModeLED(subsystems));
-    new Trigger(MatchTime::isEndgame).whileTrue(LEDCommands.endgameLED(subsystems));
+    new Trigger(MatchUtil::isEndgame).whileTrue(LEDCommands.endgameLED(subsystems));
 
     driverController
         .a()

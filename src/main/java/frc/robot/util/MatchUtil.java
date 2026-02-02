@@ -8,8 +8,10 @@
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 
-public class MatchTime {
+public class MatchUtil {
 
   private static final double PRE_FIRST_SHIFT_START_TIME = 135.0;
   private static final double FIRST_SHIFT_START_TIME = 130.0;
@@ -19,6 +21,12 @@ public class MatchTime {
   private static final double THIRD_SHIFT_START_TIME = 80.0;
   private static final double PRE_FOURTH_SHIFT_START_TIME = 60.0;
   private static final double FOURTH_SHIFT_START_TIME = 55.0;
+
+  public static boolean isCompetition() {
+    var matchType = DriverStation.getMatchType();
+
+    return matchType != MatchType.None;
+  }
 
   public static double getMatchTime() {
     return DriverStation.getMatchTime();
@@ -123,5 +131,11 @@ public class MatchTime {
       }
     }
     return false;
+  }
+
+  /** {@return true if the robot is on the red alliance, false otherwise} */
+  public static boolean isRedAlliance() {
+    var alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    return alliance == Alliance.Red;
   }
 }

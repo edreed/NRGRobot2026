@@ -20,6 +20,7 @@ import com.nrg948.preferences.ProfiledPIDControllerPreference;
 import frc.robot.parameters.AprilTagFieldParameters;
 import frc.robot.parameters.PoseEstimationStrategy;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.DashboardMode;
 
 /** Defines robot preferences that can be adjusted via the dashboard. */
 @DashboardDefinition
@@ -44,10 +45,14 @@ public final class RobotPreferences {
         new BooleanPreference("AprilTag", "Enable Back Right", false);
   }
 
-  @DashboardLayout(title = "April Tag", column = 0, row = 2, width = 1, height = 3)
+  @DashboardLayout(title = "April Tag", column = 2, row = 1, width = 1, height = 3)
   public static final AprilTagPreferences APRIL_TAG = new AprilTagPreferences();
 
-  @DashboardComboBoxChooser(title = "Field Layout", column = 0, row = 1, width = 2, height = 1)
+  @DashboardComboBoxChooser(title = "Dashboard Mode", column = 0, row = 1, width = 2, height = 1)
+  public static EnumPreference<DashboardMode> DASHBOARD_MODE =
+      new EnumPreference<DashboardMode>("Dashboard", "Dashboard Mode", DashboardMode.COMPETITION);
+
+  @DashboardComboBoxChooser(title = "Field Layout", column = 0, row = 2, width = 2, height = 1)
   public static EnumPreference<AprilTagFieldParameters> FIELD_LAYOUT_PREFERENCE =
       new EnumPreference<AprilTagFieldParameters>(
           "AprilTag", "Field Layout", AprilTagFieldParameters.k2026RebuiltWelded);
@@ -55,7 +60,7 @@ public final class RobotPreferences {
   @DashboardComboBoxChooser(
       title = "Pose Est. Strategy",
       column = 0,
-      row = 5,
+      row = 3,
       width = 2,
       height = 1)
   public static EnumPreference<PoseEstimationStrategy> POSE_ESTIMATION_STRATEGY =

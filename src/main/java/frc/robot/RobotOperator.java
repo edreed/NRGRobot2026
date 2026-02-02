@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.MatchTime;
+import frc.robot.util.MatchUtil;
 
 @DashboardDefinition
 public final class RobotOperator {
@@ -81,7 +81,7 @@ public final class RobotOperator {
 
   @DashboardMatchTime(title = "Match Time", row = 0, column = 6, width = 3, height = 2)
   public static double getMatchTime() {
-    return MatchTime.getMatchTime();
+    return MatchUtil.getMatchTime();
   }
 
   public void periodic() {

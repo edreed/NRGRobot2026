@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.FieldUtils;
+import frc.robot.util.MatchUtil;
 
 /* You should consider using the more terse Command factories API instead
 https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -111,7 +111,7 @@ public class AlignToPose extends Command {
         MathUtil.clamp(
             rController.calculate(currentR), -MAX_ROTATIONAL_POWER, MAX_ROTATIONAL_POWER);
 
-    if (FieldUtils.isRedAlliance()) {
+    if (MatchUtil.isRedAlliance()) {
       xSpeed = -xSpeed;
       ySpeed = -ySpeed;
     }

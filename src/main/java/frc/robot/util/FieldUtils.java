@@ -13,8 +13,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotPreferences;
 
 public final class FieldUtils {
@@ -42,12 +40,6 @@ public final class FieldUtils {
           .getTranslation()
           .plus(new Translation2d(APRIL_TAG_TO_HUB, 0));
 
-  /** {@return true if the robot is on the red alliance, false otherwise} */
-  public static boolean isRedAlliance() {
-    var alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    return alliance == Alliance.Red;
-  }
-
   /** {@return the {@link AprilTagFieldLayout} for the current competition year} */
   public static AprilTagFieldLayout getFieldLayout() {
     return FIELD_LAYOUT;
@@ -65,7 +57,7 @@ public final class FieldUtils {
 
   /** {@return the ID of the alliance-side hub's center April tag} */
   private static int getHubAprilTagID() {
-    if (isRedAlliance()) {
+    if (MatchUtil.isRedAlliance()) {
       return RED_HUB_APRILTAG;
     }
     return BLUE_HUB_APRILTAG;
@@ -78,7 +70,7 @@ public final class FieldUtils {
 
   /** {@return the {@link Translation2d} of the center of the alliance-side hub} */
   public static Translation2d getHubLocation() {
-    if (isRedAlliance()) {
+    if (MatchUtil.isRedAlliance()) {
       return RED_HUB_POSITION;
     }
     return BLUE_HUB_POSITION;
@@ -86,6 +78,6 @@ public final class FieldUtils {
 
   /** {@return the initial orientation of the robot at the start of the match} */
   public static Rotation2d getInitialOrientation() {
-    return isRedAlliance() ? Rotation2d.k180deg : Rotation2d.kZero;
+    return MatchUtil.isRedAlliance() ? Rotation2d.k180deg : Rotation2d.kZero;
   }
 }
