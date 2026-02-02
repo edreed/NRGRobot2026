@@ -26,15 +26,21 @@ import frc.robot.util.MatchTime;
  */
 public class RobotContainer {
 
-  @DashboardTab(title = "Operator")
+  @DashboardTab(
+      title = "Operator",
+      modes = {"Competition", "Testing"})
   private final RobotOperator operator;
 
-  @DashboardTab(title = "Preferences")
+  @DashboardTab(
+      title = "Preferences",
+      modes = {"Competition", "Testing"})
   private final RobotPreferences preferences = new RobotPreferences();
 
   private final Subsystems subsystems = new Subsystems();
 
-  @DashboardTab(title = "Autonomous")
+  @DashboardTab(
+      title = "Autonomous",
+      modes = {"Competition", "Testing"})
   private final Autos autos = new Autos(subsystems);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed

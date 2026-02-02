@@ -22,24 +22,36 @@ import java.util.stream.Collectors;
 
 public class Subsystems {
 
-  @DashboardTab(title = "Swerve")
+  @DashboardTab(
+      title = "Swerve",
+      modes = {"Testing", "Vision Testing"})
   public final Swerve drivetrain = new Swerve();
 
-  @DashboardTab(title = "Intake")
+  @DashboardTab(
+      title = "Intake",
+      modes = {"Testing"})
   public final Intake intake = new Intake();
 
-  @DashboardTab(title = "IntakeArm")
+  @DashboardTab(
+      title = "IntakeArm",
+      modes = {"Testing"})
   public final IntakeArm intakeArm = new IntakeArm();
 
-  @DashboardTab(title = "Shooter")
+  @DashboardTab(
+      title = "Shooter",
+      modes = {"Testing"})
   public final Shooter shooter = new Shooter();
 
-  @DashboardTab(title = "Indexer")
+  @DashboardTab(
+      title = "Indexer",
+      modes = {"Testing"})
   public final Indexer indexer = new Indexer();
 
   public final StatusLED statusLEDs = new StatusLED();
 
-  @DashboardTab(title = "Front Left Camera")
+  @DashboardTab(
+      title = "Front Left Camera",
+      modes = {"Vision Testing"})
   public final Optional<AprilTag> frontLeftCamera =
       AprilTag.PARAMETERS
           .frontLeft()
@@ -52,7 +64,9 @@ public class Subsystems {
                       c.robotToCamera(),
                       c.streamPort()));
 
-  @DashboardTab(title = "Front Right Camera")
+  @DashboardTab(
+      title = "Front Right Camera",
+      modes = {"Vision Testing"})
   public final Optional<AprilTag> frontRightCamera =
       AprilTag.PARAMETERS
           .frontRight()
@@ -65,7 +79,9 @@ public class Subsystems {
                       c.robotToCamera(),
                       c.streamPort()));
 
-  @DashboardTab(title = "Back Left Camera")
+  @DashboardTab(
+      title = "Back Left Camera",
+      modes = {"Vision Testing"})
   public final Optional<AprilTag> backLeftCamera =
       AprilTag.PARAMETERS
           .backLeft()
@@ -78,7 +94,9 @@ public class Subsystems {
                       c.robotToCamera(),
                       c.streamPort()));
 
-  @DashboardTab(title = "Back Right Camera")
+  @DashboardTab(
+      title = "Back Right Camera",
+      modes = {"Vision Testing"})
   public final Optional<AprilTag> backRightCamera =
       AprilTag.PARAMETERS
           .backRight()
