@@ -49,7 +49,7 @@ public class RobotContainer {
   @DashboardTab(title = "Preferences")
   private final RobotPreferences preferences = new RobotPreferences();
 
-  private final Subsystems subsystems = new Subsystems(manipulatorController);
+  private final Subsystems subsystems = new Subsystems();
 
   @DashboardTab(title = "Autonomous")
   private final Autos autos = new Autos(subsystems);
@@ -160,6 +160,7 @@ public class RobotContainer {
   public void disableInit() {
     subsystems.disableManipulators();
     subsystems.setIdleMode(MotorIdleMode.COAST);
+    subsystems.drivetrain.setIdleMode(MotorIdleMode.BRAKE);
   }
 
   public void periodic() {
