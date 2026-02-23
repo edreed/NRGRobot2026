@@ -6,6 +6,30 @@
     "grid_layout" : {
       "layouts" : [ ],
       "containers" : [ {
+        "title" : "Autonomous Routine",
+        "type" : "ComboBox Chooser",
+        "x" : 1152.0,
+        "y" : 256.0,
+        "width" : 384.0,
+        "height" : 128.0,
+        "properties" : {
+          "topic" : "/SmartDashboard/Operator/Autonomous Routine",
+          "period" : 0.06,
+          "sort_options" : false
+        }
+      }, {
+        "title" : "Autonomous Delay",
+        "type" : "ComboBox Chooser",
+        "x" : 1152.0,
+        "y" : 384.0,
+        "width" : 384.0,
+        "height" : 128.0,
+        "properties" : {
+          "topic" : "/SmartDashboard/Operator/Autonomous Delay",
+          "period" : 0.06,
+          "sort_options" : false
+        }
+      }, {
         "title" : "Field",
         "type" : "Field",
         "x" : 0.0,
@@ -121,9 +145,9 @@
       "layouts" : [ {
         "title" : "April Tag",
         "type" : "List Layout",
-        "x" : 0.0,
-        "y" : 256.0,
-        "width" : 128.0,
+        "x" : 640.0,
+        "y" : 0.0,
+        "width" : 256.0,
         "height" : 384.0,
         "properties" : {
           "label_position" : "TOP"
@@ -177,8 +201,8 @@
       "containers" : [ {
         "title" : "Field Layout",
         "type" : "ComboBox Chooser",
-        "x" : 0.0,
-        "y" : 128.0,
+        "x" : 896.0,
+        "y" : 0.0,
         "width" : 256.0,
         "height" : 128.0,
         "properties" : {
@@ -189,14 +213,25 @@
       }, {
         "title" : "Pose Est. Strategy",
         "type" : "ComboBox Chooser",
-        "x" : 0.0,
-        "y" : 640.0,
+        "x" : 896.0,
+        "y" : 128.0,
         "width" : 256.0,
         "height" : 128.0,
         "properties" : {
           "topic" : "/SmartDashboard/Preferences/Pose Est. Strategy",
           "period" : 0.06,
           "sort_options" : false
+        }
+      }, {
+        "title" : "Auto Override Odometry With Pose",
+        "type" : "Toggle Switch",
+        "x" : 896.0,
+        "y" : 256.0,
+        "width" : 256.0,
+        "height" : 128.0,
+        "properties" : {
+          "topic" : "/SmartDashboard/Preferences/Auto Override Odometry With Pose",
+          "period" : 0.06
         }
       }, {
         "title" : "Robot Selector",
@@ -213,8 +248,8 @@
       }, {
         "title" : "Auto Rotation PID",
         "type" : "PID Controller",
-        "x" : 640.0,
-        "y" : 0.0,
+        "x" : 384.0,
+        "y" : 128.0,
         "width" : 256.0,
         "height" : 384.0,
         "properties" : {
@@ -230,17 +265,6 @@
         "height" : 128.0,
         "properties" : {
           "topic" : "/SmartDashboard/Preferences/Enable Rumble",
-          "period" : 0.06
-        }
-      }, {
-        "title" : "Auto Override Odometry With Pose",
-        "type" : "Toggle Switch",
-        "x" : 896.0,
-        "y" : 0.0,
-        "width" : 256.0,
-        "height" : 128.0,
-        "properties" : {
-          "topic" : "/SmartDashboard/Preferences/Auto Override Odometry With Pose",
           "period" : 0.06
         }
       }, {
@@ -261,45 +285,15 @@
       } ]
     }
   }, {
-    "name" : "Autonomous",
-    "grid_layout" : {
-      "layouts" : [ ],
-      "containers" : [ {
-        "title" : "Routine",
-        "type" : "ComboBox Chooser",
-        "x" : 0.0,
-        "y" : 0.0,
-        "width" : 256.0,
-        "height" : 128.0,
-        "properties" : {
-          "topic" : "/SmartDashboard/Autonomous/Routine",
-          "period" : 0.06,
-          "sort_options" : false
-        }
-      }, {
-        "title" : "Delay (sec)",
-        "type" : "ComboBox Chooser",
-        "x" : 0.0,
-        "y" : 128.0,
-        "width" : 256.0,
-        "height" : 128.0,
-        "properties" : {
-          "topic" : "/SmartDashboard/Autonomous/Delay (sec)",
-          "period" : 0.06,
-          "sort_options" : false
-        }
-      } ]
-    }
-  }, {
     "name" : "Swerve",
     "grid_layout" : {
       "layouts" : [ {
         "title" : "Estimated Pose",
         "type" : "List Layout",
-        "x" : 1152.0,
+        "x" : 1024.0,
         "y" : 0.0,
         "width" : 256.0,
-        "height" : 640.0,
+        "height" : 384.0,
         "properties" : {
           "label_position" : "TOP"
         },
@@ -791,7 +785,7 @@
       }, {
         "title" : "PID",
         "type" : "PID Controller",
-        "x" : 768.0,
+        "x" : 512.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 384.0,
@@ -833,7 +827,7 @@
       }, {
         "title" : "Test Velocity (m/s)",
         "type" : "Text Display",
-        "x" : 512.0,
+        "x" : 256.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 128.0,
@@ -845,8 +839,8 @@
       }, {
         "title" : "Set Test Velocities (m/s)",
         "type" : "Command",
-        "x" : 512.0,
-        "y" : 256.0,
+        "x" : 256.0,
+        "y" : 128.0,
         "width" : 256.0,
         "height" : 128.0,
         "properties" : {
@@ -858,8 +852,8 @@
       }, {
         "title" : "Disable",
         "type" : "Command",
-        "x" : 512.0,
-        "y" : 384.0,
+        "x" : 256.0,
+        "y" : 256.0,
         "width" : 256.0,
         "height" : 128.0,
         "properties" : {
@@ -974,7 +968,7 @@
       "layouts" : [ {
         "title" : "Selected April Tag",
         "type" : "List Layout",
-        "x" : 1152.0,
+        "x" : 256.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 640.0,
@@ -1141,7 +1135,7 @@
       }, {
         "title" : "Camera Stream",
         "type" : "Camera Stream",
-        "x" : 256.0,
+        "x" : 512.0,
         "y" : 0.0,
         "width" : 512.0,
         "height" : 512.0,
@@ -1172,7 +1166,7 @@
       "layouts" : [ {
         "title" : "Selected April Tag",
         "type" : "List Layout",
-        "x" : 1152.0,
+        "x" : 256.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 640.0,
@@ -1339,7 +1333,7 @@
       }, {
         "title" : "Camera Stream",
         "type" : "Camera Stream",
-        "x" : 256.0,
+        "x" : 512.0,
         "y" : 0.0,
         "width" : 512.0,
         "height" : 512.0,
@@ -1370,7 +1364,7 @@
       "layouts" : [ {
         "title" : "Selected April Tag",
         "type" : "List Layout",
-        "x" : 1152.0,
+        "x" : 256.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 640.0,
@@ -1537,7 +1531,7 @@
       }, {
         "title" : "Camera Stream",
         "type" : "Camera Stream",
-        "x" : 256.0,
+        "x" : 512.0,
         "y" : 0.0,
         "width" : 512.0,
         "height" : 512.0,
@@ -1568,7 +1562,7 @@
       "layouts" : [ {
         "title" : "Selected April Tag",
         "type" : "List Layout",
-        "x" : 1152.0,
+        "x" : 256.0,
         "y" : 0.0,
         "width" : 256.0,
         "height" : 640.0,
@@ -1735,7 +1729,7 @@
       }, {
         "title" : "Camera Stream",
         "type" : "Camera Stream",
-        "x" : 256.0,
+        "x" : 512.0,
         "y" : 0.0,
         "width" : 512.0,
         "height" : 512.0,

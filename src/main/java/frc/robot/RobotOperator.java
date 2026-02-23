@@ -8,14 +8,17 @@
 package frc.robot;
 
 import com.nrg948.dashboard.annotations.DashboardBooleanBox;
+import com.nrg948.dashboard.annotations.DashboardComboBoxChooser;
 import com.nrg948.dashboard.annotations.DashboardDefinition;
 import com.nrg948.dashboard.annotations.DashboardField;
 import com.nrg948.dashboard.annotations.DashboardMatchTime;
 import com.nrg948.dashboard.model.GameField;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.Autos;
 import frc.robot.commands.ShootingCommands;
 import frc.robot.subsystems.AprilTag;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.MatchTime;
@@ -23,25 +26,32 @@ import java.util.Optional;
 
 @DashboardDefinition
 public final class RobotOperator {
-
-  private final Intake intake;
   private final Swerve drivetrain;
-  public final Optional<AprilTag> frontLeftCamera;
-  public final Optional<AprilTag> frontRightCamera;
-  public final Optional<AprilTag> backLeftCamera;
-  public final Optional<AprilTag> backRightCamera;
+  private final Optional<AprilTag> frontLeftCamera;
+  private final Optional<AprilTag> frontRightCamera;
+  private final Optional<AprilTag> backLeftCamera;
+  private final Optional<AprilTag> backRightCamera;
 
-  public RobotOperator(Subsystems subsystems) {
-    intake = subsystems.intake;
+  @DashboardComboBoxChooser(
+      title = "Autonomous Routine",
+      column = 9,
+      row = 2,
+      width = 3,
+      height = 1)
+  private final SendableChooser<Command> autoChooser;
+
+  @DashboardComboBoxChooser(title = "Autonomous Delay", column = 9, row = 3, width = 3, height = 1)
+  private final SendableChooser<Integer> delayChooser;
+
+  public RobotOperator(Subsystems subsystems, Autos autonomous) {
     drivetrain = subsystems.drivetrain;
     frontLeftCamera = subsystems.frontLeftCamera;
     frontRightCamera = subsystems.frontRightCamera;
     backLeftCamera = subsystems.backLeftCamera;
     backRightCamera = subsystems.backRightCamera;
+    autoChooser = autonomous.getAutoChooser();
+    delayChooser = autonomous.getDelayChooser();
   }
-
-  private static final double MIN_SPEED = 0.0;
-  private static final double MAX_SPEED = 5.0;
 
   @DashboardField(
       title = "Field",
@@ -74,7 +84,7 @@ public final class RobotOperator {
       width = 1,
       height = 1)
   public boolean frontRightCameraIsConnected() {
-    return frontLeftCamera.map((c) -> c.isCameraConnected()).orElse(false);
+    return frontRightCamera.map((c) -> c.isCameraConnected()).orElse(false);
   }
 
   @DashboardBooleanBox(
