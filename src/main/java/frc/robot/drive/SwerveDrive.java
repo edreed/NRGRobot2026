@@ -17,7 +17,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import frc.robot.parameters.SwerveDriveParameters;
-import frc.robot.util.FieldUtils;
+import frc.robot.util.MatchUtil;
 import java.util.function.Supplier;
 
 /** SwerveDrive implements swerve drive control. */
@@ -143,7 +143,7 @@ public class SwerveDrive extends RobotDriveBase {
       setChassisSpeeds(chassisSpeeds);
     } else {
 
-      if (FieldUtils.isRedAlliance()) {
+      if (MatchUtil.isRedAlliance()) {
         xSpeed *= -1.0;
         ySpeed *= -1.0;
       }

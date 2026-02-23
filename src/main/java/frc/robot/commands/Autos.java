@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.FieldUtils;
+import frc.robot.util.MatchUtil;
 import io.arxila.javatuples.LabelValue;
 import java.io.File;
 import java.util.Arrays;
@@ -61,7 +61,7 @@ public final class Autos {
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         config,
-        FieldUtils::isRedAlliance,
+        MatchUtil::isRedAlliance,
         subsystems.drivetrain);
 
     autoChooser = Autonomous.getChooser(subsystems);
