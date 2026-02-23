@@ -10,8 +10,8 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-public class MatchTime {
-
+/** Utility class for match-related information and timing. */
+public final class MatchUtil {
   private static final double PRE_FIRST_SHIFT_START_TIME = 135.0;
   private static final double FIRST_SHIFT_START_TIME = 130.0;
   private static final double PRE_SECOND_SHIFT_START_TIME = 110.0;
@@ -21,100 +21,116 @@ public class MatchTime {
   private static final double PRE_FOURTH_SHIFT_START_TIME = 60.0;
   private static final double FOURTH_SHIFT_START_TIME = 55.0;
 
-  public static double getMatchTime() {
+  /** {@return the alliance the robot is on} */
+  public static Alliance getAlliance() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue);
+  }
 
+  /** {@return true if the robot is on the red alliance, false otherwise} */
+  public static boolean isRedAlliance() {
+    return getAlliance() == Alliance.Red;
+  }
+
+  /** {@return the current match time in seconds} */
+  public static double getMatchTime() {
     return DriverStation.getMatchTime();
   }
 
+  /** {@return true if the robot is in teleoperated mode} */
   public static boolean isTeleop() {
     return DriverStation.isTeleop();
   }
 
+  /** {@return true if the robot is in autonomous mode} */
   public static boolean isAutonomous() {
     return DriverStation.isAutonomous();
   }
 
+  /** {@return the remaining time in autonomous mode} */
   public static double getAutoTimeRemaining() {
     return isTeleop() ? 0 : DriverStation.getMatchTime();
   }
 
+  /** {@return the remaining time in teleoperated mode} */
   public static double getTeleopTimeRemaining() {
     return isAutonomous() ? 0 : DriverStation.getMatchTime();
   }
 
   /**
-   * Returns if robot is within 5 seconds of transitional periods (transition to endgame not
-   * included)
+   * {@return true if the robot is within 5 seconds of transitional periods} The transition to
+   * endgame is not included.
    */
   public static boolean isNearShiftChange() {
     if (!isTeleop()) {
       return false;
     }
+
     double time = DriverStation.getMatchTime();
+
     return (time <= PRE_FIRST_SHIFT_START_TIME && time >= FIRST_SHIFT_START_TIME)
         || (time <= PRE_SECOND_SHIFT_START_TIME && time >= SECOND_SHIFT_START_TIME)
         || (time <= PRE_THIRD_SHIFT_START_TIME && time >= THIRD_SHIFT_START_TIME)
         || (time <= PRE_FOURTH_SHIFT_START_TIME && time >= FOURTH_SHIFT_START_TIME);
   }
 
-  /*
-   * Special method of isNearShiftChange specialized for last 5 seconds before
-   * shift change but excluding the final second.
+  /**
+   * Special method of {@link #isNearShiftChange()} specialized for last 5 seconds before shift
+   * change but excluding the final second.
    */
   public static boolean isNearShiftChangeExcludingFinalSecond() {
     if (!isTeleop()) {
       return false;
     }
+
     double time = DriverStation.getMatchTime();
+
     return (time <= PRE_FIRST_SHIFT_START_TIME && time > FIRST_SHIFT_START_TIME + 1.0)
         || (time <= PRE_SECOND_SHIFT_START_TIME && time > SECOND_SHIFT_START_TIME + 1.0)
         || (time <= PRE_THIRD_SHIFT_START_TIME && time > THIRD_SHIFT_START_TIME + 1.0)
         || (time <= PRE_FOURTH_SHIFT_START_TIME && time > FOURTH_SHIFT_START_TIME + 1.0);
   }
 
-  /*
-   * Special method of isNearShiftChange specialized for the last second before
-   * shift change.
+  /**
+   * Special method of {@link #isNearShiftChange()} specialized for the last second before shift
+   * change.
    */
   public static boolean isNearShiftChangeFinalSecond() {
     if (!isTeleop()) {
       return false;
     }
+
     double time = DriverStation.getMatchTime();
+
     return (time <= FIRST_SHIFT_START_TIME + 1.0 && time >= FIRST_SHIFT_START_TIME)
         || (time <= SECOND_SHIFT_START_TIME + 1.0 && time >= SECOND_SHIFT_START_TIME)
         || (time <= THIRD_SHIFT_START_TIME + 1.0 && time >= THIRD_SHIFT_START_TIME)
         || (time <= FOURTH_SHIFT_START_TIME + 1.0 && time >= FOURTH_SHIFT_START_TIME);
   }
 
-  /*
-   * Returns a boolean to indicate if match time is 5 seconds or less before
-   * endgame.
-   */
+  /** {@return whether there is 5 seconds or less before endgame} */
   public static boolean isNearEndgame() {
     if (!isTeleop()) {
       return false;
     }
+
     double time = DriverStation.getMatchTime();
+
     return (time <= 35.0 && time >= 30.0);
   }
 
-  /*
-   * Returns a boolean to indicate if match is in endgame mode.
-   */
+  /** {@return whether the match is in endgame mode} */
   public static boolean isEndgame() {
     if (!isTeleop()) {
       return false;
     }
-    double time = DriverStation.getMatchTime();
-    return time <= 30.0;
+
+    return DriverStation.getMatchTime() <= 30.0;
   }
 
-  /** Returns if our alliance hub is active first. */
+  /** {@return true if our alliance hub is active first} */
   public static boolean ourAllianceHubIsActiveFirst() {
-    String gameData;
-    gameData = DriverStation.getGameSpecificMessage();
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    String gameData = DriverStation.getGameSpecificMessage();
+    Alliance alliance = getAlliance();
 
     if (gameData.length() > 0) {
       switch (gameData.charAt(0)) {
@@ -126,10 +142,16 @@ public class MatchTime {
           break;
       }
     }
+
     return false;
   }
 
-  public boolean isHubActive() {
+  /**
+   * {@return whether the hub is active based on the current match time and game data} The hub is
+   * active during autonomous, and then shifts between being active and inactive during teleop based
+   * on the match time and game data.
+   */
+  public static boolean isHubActive() {
     // Hub is always enabled in autonomous.
     if (DriverStation.isAutonomousEnabled()) {
       return true;
@@ -171,5 +193,9 @@ public class MatchTime {
       // End game, hub always active.
       return true;
     }
+  }
+
+  private MatchUtil() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
 }

@@ -21,7 +21,7 @@ import frc.robot.commands.ShootingCommands;
 import frc.robot.subsystems.AprilTag;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.MatchTime;
+import frc.robot.util.MatchUtil;
 import java.util.Optional;
 
 @DashboardDefinition
@@ -64,7 +64,7 @@ public final class RobotOperator {
 
   @DashboardMatchTime(title = "Match Time", row = 0, column = 9, width = 3, height = 2)
   public static double getMatchTime() {
-    return MatchTime.getMatchTime();
+    return MatchUtil.getMatchTime();
   }
 
   @DashboardBooleanBox(

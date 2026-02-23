@@ -26,7 +26,7 @@ import frc.robot.commands.ShootingCommands;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Subsystems;
-import frc.robot.util.MatchTime;
+import frc.robot.util.MatchUtil;
 import frc.robot.util.MotorIdleMode;
 
 /**
@@ -82,14 +82,14 @@ public class RobotContainer {
 
     driverController.start().onTrue(DriveCommands.resetOrientation(subsystems));
 
-    new Trigger(MatchTime::isAutonomous).whileTrue(LEDCommands.autoLEDs(subsystems));
-    new Trigger(MatchTime::isNearShiftChangeExcludingFinalSecond)
+    new Trigger(MatchUtil::isAutonomous).whileTrue(LEDCommands.autoLEDs(subsystems));
+    new Trigger(MatchUtil::isNearShiftChangeExcludingFinalSecond)
         .whileTrue(LEDCommands.setTransitionModeLED(subsystems));
-    new Trigger(MatchTime::isNearShiftChangeFinalSecond)
+    new Trigger(MatchUtil::isNearShiftChangeFinalSecond)
         .whileTrue(LEDCommands.setLastSecondTransitionModeLED(subsystems));
-    new Trigger(MatchTime::isNearEndgame)
+    new Trigger(MatchUtil::isNearEndgame)
         .whileTrue(LEDCommands.transitionToEndgameModeLED(subsystems));
-    new Trigger(MatchTime::isEndgame).whileTrue(LEDCommands.endgameLED(subsystems));
+    new Trigger(MatchUtil::isEndgame).whileTrue(LEDCommands.endgameLED(subsystems));
 
     driverController
         .a()
