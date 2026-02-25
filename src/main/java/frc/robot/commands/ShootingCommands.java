@@ -18,42 +18,42 @@ import java.util.function.DoubleSupplier;
 
 public final class ShootingCommands {
 
-  public static final double MAXIMUM_SHOOTING_RANGE = 3.5;
+  public static final double MAXIMUM_SHOOTING_RANGE = 3.7;
   public static final double HUB_SHOT_DISTANCE = 1.3;
   public static final double TOWER_SHOT_DISTANCE = 3.05;
 
-  public static Command shootWhenInRange(Subsystems subsystem) {
-    Indexer indexer = subsystem.indexer;
-    Shooter shooter = subsystem.shooter;
-    Swerve drivetrain = subsystem.drivetrain;
-    Intake intake = subsystem.intake;
+  public static Command shootWhenInRange(Subsystems subsystems) {
+    Indexer indexer = subsystems.indexer;
+    Shooter shooter = subsystems.shooter;
+    Swerve drivetrain = subsystems.drivetrain;
+    Intake intake = subsystems.intake;
     return Commands.sequence(
         Commands.idle(indexer, shooter, intake)
             .until(() -> drivetrain.getDistanceToHub() <= MAXIMUM_SHOOTING_RANGE),
-        shoot(subsystem));
+        shoot(subsystems));
   }
 
-  public static Command shoot(Subsystems subsystem) {
-    Swerve drivetrain = subsystem.drivetrain;
-    return shootForDistance(subsystem, drivetrain::getDistanceToHub);
+  public static Command shoot(Subsystems subsystems) {
+    Swerve drivetrain = subsystems.drivetrain;
+    return shootForDistance(subsystems, drivetrain::getDistanceToHub);
   }
 
-  public static Command shootFromHub(Subsystems subsystem) {
-    return shootForDistance(subsystem, () -> HUB_SHOT_DISTANCE);
+  public static Command shootFromHub(Subsystems subsystems) {
+    return shootForDistance(subsystems, () -> HUB_SHOT_DISTANCE);
   }
 
-  public static Command shootFromTower(Subsystems subsystem) {
-    return shootForDistance(subsystem, () -> TOWER_SHOT_DISTANCE);
+  public static Command shootFromTower(Subsystems subsystems) {
+    return shootForDistance(subsystems, () -> TOWER_SHOT_DISTANCE);
   }
 
-  private static Command shootForDistance(Subsystems subsystem, DoubleSupplier distance) {
-    Indexer indexer = subsystem.indexer;
-    Shooter shooter = subsystem.shooter;
-    Intake intake = subsystem.intake;
+  private static Command shootForDistance(Subsystems subsystems, DoubleSupplier distance) {
+    Indexer indexer = subsystems.indexer;
+    Shooter shooter = subsystems.shooter;
+    Intake intake = subsystems.intake;
 
     return Commands.parallel(
             Commands.run(() -> shooter.setGoalDistance(distance.getAsDouble()), shooter),
-            feedBallsToShooter(indexer, shooter, intake))
+            feedBallsToShooter(subsystems))
         .finallyDo(
             () -> {
               shooter.disable();
@@ -62,22 +62,27 @@ public final class ShootingCommands {
             });
   }
 
-  private static Command feedBallsToShooter(Indexer indexer, Shooter shooter, Intake intake) {
+  private static Command feedBallsToShooter(Subsystems subsystems) {
+    Indexer indexer = subsystems.indexer;
+    Shooter shooter = subsystems.shooter;
+    Intake intake = subsystems.intake;
+
     return Commands.sequence(
         Commands.idle(indexer).until(shooter::atOrNearGoal),
         Commands.runOnce(indexer::feed, indexer),
         Commands.runOnce(intake::intake, intake),
+        IntakeCommands.agitateArm(subsystems),
         Commands.idle(intake, indexer));
   }
 
-  public static Command shoot(Subsystems subsystem, double velocity) {
-    Indexer indexer = subsystem.indexer;
-    Shooter shooter = subsystem.shooter;
-    Intake intake = subsystem.intake;
+  public static Command shoot(Subsystems subsystems, double velocity) {
+    Indexer indexer = subsystems.indexer;
+    Shooter shooter = subsystems.shooter;
+    Intake intake = subsystems.intake;
 
     return Commands.parallel(
             Commands.run(() -> shooter.setGoalVelocity(velocity), shooter),
-            feedBallsToShooter(indexer, shooter, intake))
+            feedBallsToShooter(subsystems))
         .finallyDo(
             () -> {
               shooter.disable();

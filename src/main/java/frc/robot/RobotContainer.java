@@ -108,10 +108,10 @@ public class RobotContainer {
                 ShootingCommands.shoot(subsystems, Shooter.SHOOTER_FEED_VELOCITY)));
     driverController
         .leftTrigger()
-        .onTrue(IntakeCommands.setIntakeArmAngle(IntakeArm.BUMP_ANGLE, subsystems));
+        .onTrue(IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.BUMP_ANGLE));
     driverController
         .leftTrigger()
-        .onFalse(IntakeCommands.setIntakeArmAngle(IntakeArm.EXTENDED_ANGLE, subsystems));
+        .onFalse(IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.EXTENDED_ANGLE));
     driverController // Possibly temporary test
         .rightBumper()
         .whileTrue(IntakeCommands.intake(subsystems));
@@ -120,7 +120,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             Commands.parallel(
-                IntakeCommands.setIntakeArmAngle(IntakeArm.EXTENDED_ANGLE, subsystems),
+                IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.EXTENDED_ANGLE),
                 IntakeCommands.intake(subsystems)));
     manipulatorController
         .a()
@@ -129,13 +129,13 @@ public class RobotContainer {
         .onFalse(IndexerCommands.disableIndexer(subsystems));
     manipulatorController
         .x()
-        .onTrue(IntakeCommands.setIntakeArmAngle(IntakeArm.STOW_ANGLE, subsystems));
+        .onTrue(IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.STOW_ANGLE));
     manipulatorController
         .y()
-        .onTrue(IntakeCommands.setIntakeArmAngle(IntakeArm.BUMP_ANGLE, subsystems));
+        .onTrue(IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.BUMP_ANGLE));
     manipulatorController
         .b()
-        .onTrue(IntakeCommands.setIntakeArmAngle(IntakeArm.EXTENDED_ANGLE, subsystems));
+        .onTrue(IntakeCommands.setIntakeArmAngle(subsystems, IntakeArm.EXTENDED_ANGLE));
 
     manipulatorController
         .leftBumper()

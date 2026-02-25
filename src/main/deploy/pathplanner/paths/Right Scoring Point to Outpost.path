@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.722728611783697,
-        "y": 1.8764599475383372
+        "x": 1.6803194444444447,
+        "y": 1.4953541666666663
       },
       "isLocked": false,
       "linkedName": "Right Scoring Point"
     },
     {
       "anchor": {
-        "x": 0.41701977401129997,
-        "y": 0.665776836158193
+        "x": 0.378,
+        "y": 0.411
       },
       "prevControl": {
-        "x": 0.9140762711864421,
-        "y": 1.0625435835351096
+        "x": 1.7204732815442565,
+        "y": 1.2527578860640287
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7282878411910672,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

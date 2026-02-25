@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.851059322033899,
-        "y": 1.9468502824858764
+        "x": 3.5439444444444446,
+        "y": 2.177465277777777
       },
       "isLocked": false,
       "linkedName": "Right Bump Start"
@@ -20,8 +20,8 @@
         "y": 2.671
       },
       "prevControl": {
-        "x": 3.7091551654560133,
-        "y": 2.568239608555287
+        "x": 3.4404097222222223,
+        "y": 2.2079166666666663
       },
       "nextControl": null,
       "isLocked": false,

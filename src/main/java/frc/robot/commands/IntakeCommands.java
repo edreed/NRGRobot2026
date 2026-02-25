@@ -17,6 +17,8 @@ import frc.robot.subsystems.Subsystems;
 /** A utility class for controlling the intake. */
 public final class IntakeCommands {
 
+  private static final double AGITATE_WAIT_TIME = 0.25;
+
   /**
    * Returns Command that stows the intake.
    *
@@ -31,7 +33,7 @@ public final class IntakeCommands {
         Commands.runOnce(() -> intakeArm.setGoalAngle(IntakeArm.STOW_ANGLE), intakeArm));
   }
 
-  public static Command setIntakeArmAngle(double angle, Subsystems subsystems) {
+  public static Command setIntakeArmAngle(Subsystems subsystems, double angle) {
     IntakeArm intakeArm = subsystems.intakeArm;
     return Commands.sequence(
             Commands.runOnce(() -> intakeArm.setGoalAngle(angle), intakeArm),
@@ -72,5 +74,14 @@ public final class IntakeCommands {
     Indexer indexer = subsystems.indexer;
     // TODO Flesh out full sequence when other subsystems are finished.
     return Commands.parallel(Commands.run(intake::outtake), Commands.run(indexer::outFeed));
+  }
+
+  public static Command agitateArm(Subsystems subsystems) {
+    return Commands.sequence(
+            setIntakeArmAngle(subsystems, IntakeArm.AGITATE_ANGLE),
+            Commands.waitSeconds(AGITATE_WAIT_TIME),
+            setIntakeArmAngle(subsystems, IntakeArm.EXTENDED_ANGLE),
+            Commands.waitSeconds(AGITATE_WAIT_TIME))
+        .repeatedly();
   }
 }

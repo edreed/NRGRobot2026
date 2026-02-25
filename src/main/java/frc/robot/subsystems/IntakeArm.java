@@ -69,6 +69,7 @@ public final class IntakeArm extends SubsystemBase implements ActiveSubsystem {
 
   public static final double STOW_ANGLE = Units.degreesToRadians(140);
   public static final double BUMP_ANGLE = Units.degreesToRadians(25);
+  public static final double AGITATE_ANGLE = Units.degreesToRadians(20);
   public static final double EXTENDED_ANGLE = Units.degreesToRadians(0);
   public static final double MIN_ANGLE = Units.degreesToRadians(0);
   public static final double MAX_ANGLE = STOW_ANGLE;
