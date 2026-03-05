@@ -89,6 +89,17 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
 
   private static final DataLog LOG = DataLogManager.getLog();
   private static final Rotation2d ROTATE_180_DEGREES = Rotation2d.fromDegrees(180);
+  private static final SwerveModuleState SWERVE_MODULE_STATE_NEG_45 =
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+  private static final SwerveModuleState SWERVE_MODULE_STATE_45 =
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+  private static final SwerveModuleState[] X_LOCK_STATES =
+      new SwerveModuleState[] {
+        SWERVE_MODULE_STATE_45,
+        SWERVE_MODULE_STATE_NEG_45,
+        SWERVE_MODULE_STATE_NEG_45,
+        SWERVE_MODULE_STATE_45
+      };
 
   public static final SwerveDriveParameters PARAMETERS =
       RobotPreferences.ROBOT_TYPE.selectOrDefault(
@@ -498,6 +509,11 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] states) {
     drivetrain.setModuleStates(states);
+  }
+
+  /** Changes the wheel orientation to lock the robot in place. */
+  public void setXLock() {
+    setModuleStates(X_LOCK_STATES);
   }
 
   // Stops motors from the subsystem - may need to remove this (not sure - Om)
