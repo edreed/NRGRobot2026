@@ -11,6 +11,7 @@ import com.nrg948.dashboard.annotations.DashboardAlerts;
 import com.nrg948.dashboard.annotations.DashboardBooleanBox;
 import com.nrg948.dashboard.annotations.DashboardComboBoxChooser;
 import com.nrg948.dashboard.annotations.DashboardCommand;
+import com.nrg948.dashboard.annotations.DashboardCommandScheduler;
 import com.nrg948.dashboard.annotations.DashboardDefinition;
 import com.nrg948.dashboard.annotations.DashboardField;
 import com.nrg948.dashboard.annotations.DashboardMatchTime;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Autos;
 import frc.robot.parameters.AutoSide;
@@ -60,8 +62,16 @@ public final class RobotOperator {
   @DashboardComboBoxChooser(title = "Autonomous Delay", column = 9, row = 4, width = 3, height = 1)
   private final SendableChooser<Integer> delayChooser = Autos.getDelayChooser();
 
-  @DashboardAlerts(title = "Alerts", column = 0, row = 4, width = 7, height = 2)
+  @DashboardAlerts(title = "Alerts", column = 0, row = 4, width = 5, height = 2)
   private final Alert[] alerts = new Alert[] {Autos.getInvalidAutoAlert()};
+
+  @DashboardCommandScheduler(
+      title = "Command Scheduler",
+      column = 5,
+      row = 4,
+      width = 2,
+      height = 2)
+  private final CommandScheduler commandScheduler = CommandScheduler.getInstance();
 
   public RobotOperator(Subsystems subsystems) {
     drivetrain = subsystems.drivetrain;
