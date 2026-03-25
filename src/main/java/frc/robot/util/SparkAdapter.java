@@ -22,7 +22,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 /** A motor controller implementation based on the REV Robotics Spark controllers. */
-public final class SparkAdapter implements MotorController {
+public class SparkAdapter implements MotorController {
   private interface Accessor {
     /** Returns the motor controller. */
     SparkBase get();

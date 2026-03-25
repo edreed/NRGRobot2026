@@ -7,6 +7,7 @@
  
 package frc.robot.util;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -102,6 +103,33 @@ public final class TalonFXAdapter implements MotorController {
     motorOutputConfigs.Inverted = direction.forTalonFX();
 
     applyConfig(talonFX, motorOutputConfigs);
+  }
+
+  /**
+   * Constructs a TalonFXAdapter.
+   *
+   * @param logPrefix The prefix for the log entries.
+   * @param deviceID The device ID of the TalonFX.
+   * @param direction The direction the motor rotates when a positive voltage is applied.
+   * @param idleMode The motor behavior when idle (i.e. brake or coast mode).
+   * @param distancePerRotation The distance the attached mechanism moves per rotation of the motor
+   *     output shaft.
+   *     <p>The unit of measure depends on the mechanism. For a mechanism that produces linear
+   *     motion, the unit is typically in meters. For a mechanism that produces rotational motion,
+   *     the unit is typically in radians.
+   */
+  public TalonFXAdapter(
+      String logPrefix,
+      int deviceID,
+      MotorDirection direction,
+      MotorIdleMode idleMode,
+      double distancePerRotation) {
+    this(
+        logPrefix,
+        new TalonFX(deviceID, CANBus.roboRIO()),
+        direction,
+        idleMode,
+        distancePerRotation);
   }
 
   @Override
