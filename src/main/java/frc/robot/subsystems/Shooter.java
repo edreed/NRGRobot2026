@@ -36,9 +36,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotPreferences;
-import frc.robot.RobotSelector;
-import java.util.Map;
 
 @DashboardDefinition
 public final class Shooter extends SubsystemBase implements ActiveSubsystem {
@@ -47,12 +44,7 @@ public final class Shooter extends SubsystemBase implements ActiveSubsystem {
 
   private static final DataLog LOG = DataLogManager.getLog();
 
-  private static final Motors SHOOTER_MOTOR =
-      RobotPreferences.ROBOT_TYPE.selectOrDefault(
-          Map.of(
-              RobotSelector.CompetitionRobot2026, Motors.KrakenX44,
-              RobotSelector.PracticeRobot2026, Motors.KrakenX44),
-          Motors.NullMotor);
+  private static final Motors SHOOTER_MOTOR = Motors.KrakenX44;
 
   private static final double GEAR_RATIO = 1.0;
   private static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
