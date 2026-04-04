@@ -54,16 +54,16 @@ public final class IntakeArm extends SubsystemBase implements ActiveSubsystem {
 
   private static final double TOLERANCE = Units.degreesToRadians(5.0);
 
-  private static final double GEAR_RATIO = isCompBot() ? 37.5 : 50.0;
+  private static final double GEAR_RATIO = isCompBot() ? 62.5 : 50.0;
   private static final double RADIANS_PER_ROTATION = 2 * Math.PI;
-  private static final double MASS = Units.lbsToKilograms(5.5);
-  private static final double LENGTH = Units.inchesToMeters(10.94);
+  private static final double MASS = Units.lbsToKilograms(8.108);
+  private static final double LENGTH = Units.inchesToMeters(11.8);
   private static final double MAX_VELOCITY =
       (RADIANS_PER_ROTATION * MOTOR.getFreeSpeedRPM()) / 60.0;
   private static final double MAX_ACCELERATION =
       (MOTOR.getStallTorque() * GEAR_RATIO) / ((MASS * LENGTH * LENGTH) / 3.0);
 
-  public static final double STOW_ANGLE = Units.degreesToRadians(isCompBot() ? 118.78 : 140);
+  public static final double STOW_ANGLE = Units.degreesToRadians(isCompBot() ? 129.0 : 140);
   public static final double BUMP_ANGLE = Units.degreesToRadians(28);
   public static final double AGITATE_ANGLE = Units.degreesToRadians(isCompBot() ? 25 : 20);
   public static final double EXTENDED_ANGLE = Units.degreesToRadians(0);
