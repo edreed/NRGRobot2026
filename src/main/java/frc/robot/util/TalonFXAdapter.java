@@ -11,6 +11,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import java.util.HashMap;
+import java.util.function.Function;
 
 /** A motor controller implementation based on the CTR Electronics TalonFX controller. */
 public final class TalonFXAdapter implements MotorController {
@@ -185,113 +187,6 @@ public final class TalonFXAdapter implements MotorController {
   }
 
   /**
-   * Gets the current motor output configuration.
-   *
-   * @return The current motor output configuration.
-   * @throws MotorConfigException If the configuration cannot be retrieved.
-   */
-  public MotorOutputConfigs getMotorOutputConfig() throws MotorConfigException {
-    var motorOutputConfig = new MotorOutputConfigs();
-    StatusCode status = StatusCode.OK;
-
-    for (int i = 0; i < NUM_RETRIES; i++) {
-      status = talonFX.getConfigurator().refresh(motorOutputConfig);
-      if (status.isOK()) {
-        return motorOutputConfig;
-      }
-    }
-
-    String errorMessage =
-        String.format(
-            "ERROR: Failed to get motor output config from ID %d: %s (%s)",
-            talonFX.getDeviceID(), status.getDescription(), status.getName());
-
-    DriverStation.reportError(errorMessage, true);
-
-    throw new MotorConfigException(errorMessage);
-  }
-
-  /**
-   * Applies the motor output configuration.
-   *
-   * @param motorOutputConfigs The motor output configuration to apply.
-   * @throws MotorConfigException If the configuration is invalid or we fail to apply it for any
-   *     reason.
-   */
-  public void applyMotorOutputConfig(MotorOutputConfigs motorOutputConfigs)
-      throws MotorConfigException {
-    StatusCode status = StatusCode.OK;
-    for (int i = 0; i < NUM_RETRIES; i++) {
-      status = talonFX.getConfigurator().apply(motorOutputConfigs);
-      if (status.isOK()) {
-        return;
-      }
-    }
-    String errorMessage =
-        String.format(
-            "ERROR: Failed to apply motor output config to ID %d: %s (%s)",
-            talonFX.getDeviceID(), status.getDescription(), status.getName());
-
-    DriverStation.reportError(errorMessage, true);
-
-    throw new MotorConfigException(errorMessage);
-  }
-
-  /**
-   * Gets the current Talon FX configuration.
-   *
-   * @return The current Talon FX configuration.
-   * @throws MotorConfigException If the configuration cannot be retrieved.
-   */
-  public TalonFXConfiguration getTalonFXConfiguration() throws MotorConfigException {
-    var talonFXConfig = new TalonFXConfiguration();
-    StatusCode status = StatusCode.OK;
-
-    for (int i = 0; i < NUM_RETRIES; i++) {
-      status = talonFX.getConfigurator().refresh(talonFXConfig);
-      if (status.isOK()) {
-        return talonFXConfig;
-      }
-    }
-
-    String errorMessage =
-        String.format(
-            "ERROR: Failed to get TalonFX config from ID %d: %s (%s)",
-            talonFX.getDeviceID(), status.getDescription(), status.getName());
-
-    DriverStation.reportError(errorMessage, true);
-
-    throw new MotorConfigException(errorMessage);
-  }
-
-  /**
-   * Applies a full TalonFX configuration.
-   *
-   * @param config the TalonFX configuration to apply.
-   * @throws MotorConfigException If the configuration is invalid or we fail to apply it for any
-   *     reason.
-   */
-  public void applyTalonFXConfiguration(TalonFXConfiguration config) throws MotorConfigException {
-    StatusCode status = StatusCode.OK;
-
-    for (int i = 0; i < NUM_RETRIES; i++) {
-      status = talonFX.getConfigurator().apply(config);
-      if (status.isOK()) {
-        return;
-      }
-    }
-
-    String errorMessage =
-        String.format(
-            "ERROR: Failed to apply TalonFX config to ID %d: %s (%s)",
-            talonFX.getDeviceID(), status.getDescription(), status.getName());
-
-    DriverStation.reportError(errorMessage, true);
-
-    throw new MotorConfigException(errorMessage);
-  }
-
-  /**
    * Sets the MotionMagic voltage
    *
    * @param voltage The voltage and optional feedforward to set for the MotionMagic control mode.
@@ -307,6 +202,126 @@ public final class TalonFXAdapter implements MotorController {
    */
   public void setControl(MotionMagicVelocityVoltage velocity) {
     talonFX.setControl(velocity);
+  }
+
+  /**
+   * Gets a configuration from the TalonFX with retries and error handling.
+   *
+   * @param configClass The class of the configuration to retrieve.
+   * @param refresher A function that refreshes the configuration.
+   * @param <T> The type of the configuration.
+   * @return The retrieved configuration.
+   * @throws MotorConfigException If the configuration cannot be retrieved.
+   */
+  private <T extends ParentConfiguration> T getConfig(
+      Class<T> configClass, Function<T, StatusCode> refresher) throws MotorConfigException {
+    T config;
+    StatusCode status = StatusCode.OK;
+
+    try {
+      config = configClass.getDeclaredConstructor().newInstance();
+    } catch (Exception e) {
+      String errorMessage =
+          String.format(
+              "Failed to create instance of config class %s: %s",
+              configClass.getSimpleName(), e.getMessage());
+      DriverStation.reportError(errorMessage, true);
+      throw new MotorConfigException(errorMessage, e);
+    }
+
+    for (int i = 0; i < NUM_RETRIES; i++) {
+      status = refresher.apply(config);
+      if (status.isOK()) {
+        return config;
+      }
+    }
+
+    String errorMessage =
+        String.format(
+            "Failed to get %s from ID %d: %s (%s)",
+            configClass.getSimpleName(),
+            talonFX.getDeviceID(),
+            status.getDescription(),
+            status.getName());
+
+    DriverStation.reportError(errorMessage, true);
+
+    throw new MotorConfigException(errorMessage);
+  }
+
+  /**
+   * Applies a configuration to the TalonFX with retries and error handling.
+   *
+   * @param config The configuration to apply.
+   * @param applier A function that applies the configuration.
+   * @param <T> The type of the configuration.
+   * @throws MotorConfigException If the configuration cannot be applied.
+   */
+  private <T extends ParentConfiguration> void applyConfig(
+      T config, Function<T, StatusCode> applier) throws MotorConfigException {
+    StatusCode status = StatusCode.OK;
+
+    for (int i = 0; i < NUM_RETRIES; i++) {
+      status = applier.apply(config);
+      if (status.isOK()) {
+        return;
+      }
+    }
+
+    String errorMessage =
+        String.format(
+            "Failed to apply %s to ID %d: %s (%s)",
+            config.getClass().getSimpleName(),
+            talonFX.getDeviceID(),
+            status.getDescription(),
+            status.getName());
+
+    DriverStation.reportError(errorMessage, true);
+
+    throw new MotorConfigException(errorMessage);
+  }
+
+  /**
+   * Gets the current motor output configuration.
+   *
+   * @return The current motor output configuration.
+   * @throws MotorConfigException If the configuration cannot be retrieved.
+   */
+  public MotorOutputConfigs getMotorOutputConfig() throws MotorConfigException {
+    return getConfig(MotorOutputConfigs.class, talonFX.getConfigurator()::refresh);
+  }
+
+  /**
+   * Applies the motor output configuration.
+   *
+   * @param motorOutputConfigs The motor output configuration to apply.
+   * @throws MotorConfigException If the configuration is invalid or we fail to apply it for any
+   *     reason.
+   */
+  public void applyMotorOutputConfig(MotorOutputConfigs motorOutputConfigs)
+      throws MotorConfigException {
+    applyConfig(motorOutputConfigs, talonFX.getConfigurator()::apply);
+  }
+
+  /**
+   * Gets the current Talon FX configuration.
+   *
+   * @return The current Talon FX configuration.
+   * @throws MotorConfigException If the configuration cannot be retrieved.
+   */
+  public TalonFXConfiguration getTalonFXConfiguration() throws MotorConfigException {
+    return getConfig(TalonFXConfiguration.class, talonFX.getConfigurator()::refresh);
+  }
+
+  /**
+   * Applies a full TalonFX configuration.
+   *
+   * @param config the TalonFX configuration to apply.
+   * @throws MotorConfigException If the configuration is invalid or we fail to apply it for any
+   *     reason.
+   */
+  public void applyTalonFXConfiguration(TalonFXConfiguration config) throws MotorConfigException {
+    applyConfig(config, talonFX.getConfigurator()::apply);
   }
 
   @Override

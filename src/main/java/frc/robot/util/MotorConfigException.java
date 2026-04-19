@@ -13,4 +13,9 @@ public class MotorConfigException extends Exception {
   public MotorConfigException(String message) {
     super(message);
   }
+
+  /** Creates a new MotorConfigException with the specified message and cause. */
+  public MotorConfigException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
