@@ -124,9 +124,9 @@ public final class ShootingCommands {
 
     return Commands.sequence(
             Commands.idle(indexer).until(readyToShoot),
-            Commands.runOnce(hopper::feed, hopper),
             Commands.runOnce(indexer::feed, indexer),
-            Commands.runOnce(intake::intake, intake),
+            Commands.runOnce(hopper::feed, hopper),
+            Commands.runOnce(intake::intakeWhileShooting, intake),
             IntakeCommands.agitateArm(subsystems),
             Commands.idle(intake, indexer))
         .withName("FeedBallsToShooter");

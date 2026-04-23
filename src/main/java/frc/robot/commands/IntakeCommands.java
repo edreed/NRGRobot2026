@@ -7,7 +7,6 @@
  
 package frc.robot.commands;
 
-import static frc.robot.subsystems.IntakeArm.AGITATE_ANGLES;
 import static frc.robot.subsystems.IntakeArm.EXTENDED_ANGLE;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,7 +21,7 @@ public final class IntakeCommands {
 
   private static final double AGITATE_ARM_TIMEOUT = 0.75;
   private static final double MINIMUM_SAFE_INTAKE_ANGLE = Math.toRadians(10);
-  private static final double AGITATE_WAIT_TIME = 0.25;
+  private static final double AGITATE_WAIT_TIME = 0.20;
 
   /**
    * Returns Command that stows the intake.
@@ -115,6 +114,8 @@ public final class IntakeCommands {
         moveArmToAngle(subsystems, Math.toRadians(angleDegrees)).withTimeout(AGITATE_ARM_TIMEOUT),
         Commands.waitSeconds(AGITATE_WAIT_TIME));
   }
+
+  public static final double[] AGITATE_ANGLES = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
 
   public static Command agitateArm(Subsystems subsystems) {
     return Commands.sequence(
