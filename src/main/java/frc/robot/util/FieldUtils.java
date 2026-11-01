@@ -7,16 +7,16 @@
  
 package frc.robot.util;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.RobotPreferences;
+import org.wpilib.fields.Field;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.Units;
 
 public final class FieldUtils {
-  private static AprilTagFieldLayout FIELD_LAYOUT =
+  private static Field FIELD_LAYOUT =
       RobotPreferences.FIELD_LAYOUT_PREFERENCE.getValue().loadAprilTagFieldLayout();
 
   private static final double FIELD_WIDTH = Units.inchesToMeters(317.69);
@@ -57,8 +57,8 @@ public final class FieldUtils {
           .getTranslation()
           .plus(new Translation2d(APRIL_TAG_TO_HUB, 0));
 
-  /** {@return the {@link AprilTagFieldLayout} for the current competition year} */
-  public static AprilTagFieldLayout getFieldLayout() {
+  /** {@return the {@link Field} for the current competition year} */
+  public static Field getFieldLayout() {
     return FIELD_LAYOUT;
   }
 
@@ -119,6 +119,6 @@ public final class FieldUtils {
 
   /** {@return the initial orientation of the robot at the start of the match} */
   public static Rotation2d getInitialOrientation() {
-    return MatchUtil.isRedAlliance() ? Rotation2d.k180deg : Rotation2d.kZero;
+    return MatchUtil.isRedAlliance() ? Rotation2d.PI : Rotation2d.ZERO;
   }
 }

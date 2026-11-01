@@ -9,8 +9,6 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.Shooter.HUB_SHOT_DISTANCE;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.Shooter;
@@ -19,6 +17,8 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.MatchUtil;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
 
 public final class ShootingCommands {
 

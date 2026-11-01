@@ -7,20 +7,15 @@
  
 package frc.robot.commands;
 
-import static frc.robot.RobotPreferences.ENABLE_RUMBLE;
 import static frc.robot.RobotPreferences.RIGHT_TRIGGER_SCALAR;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Swerve;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.math.util.MathUtil;
 
 /** A command that enables the driver to drive the robot using an Xbox controller. */
 public class DriveUsingController extends Command {
-
-  private static final double RUMBLE_MIN_G = 1.0;
-  private static final double RUMBLE_MAX_G = 8.0;
 
   private static final double DEADBAND = 0.08;
 
@@ -50,8 +45,7 @@ public class DriveUsingController extends Command {
 
     // The `powerScalar` linearly scales the robot's drive power from 1.0 (when the right trigger is
     // not pressed) down to RIGHT_TRIGGER_SCALAR (when the right trigger is fully depressed).
-    powerScalar =
-        (RIGHT_TRIGGER_SCALAR.getValue() - 1.0) * xboxController.getRightTriggerAxis() + 1.0;
+    powerScalar = (RIGHT_TRIGGER_SCALAR.getValue() - 1.0) * xboxController.getRightTrigger() + 1.0;
 
     // Applies deadbands to the x, y, and rotation joystick values and then multiplies all speeds by
     // the powerScalar, which allows finer driving control.
@@ -59,14 +53,6 @@ public class DriveUsingController extends Command {
     ySpeed = MathUtil.applyDeadband(ySpeed, DEADBAND) * powerScalar;
 
     drivetrain.drive(xSpeed, ySpeed, calculateRotationSpeed(), true);
-
-    if (ENABLE_RUMBLE.getValue()) {
-      // Rumbles the driver controller based on a exponential scale based on acceleration between
-      // min and max.
-      double rumblePower =
-          MathUtil.inverseInterpolate(RUMBLE_MIN_G, RUMBLE_MAX_G, drivetrain.getAcceleration());
-      xboxController.setRumble(RumbleType.kBothRumble, rumblePower * rumblePower);
-    }
   }
 
   // Called once the command ends or is interrupted.

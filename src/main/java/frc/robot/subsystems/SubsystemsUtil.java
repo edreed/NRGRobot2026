@@ -9,11 +9,11 @@ package frc.robot.subsystems;
 
 import com.nrg948.preferences.BooleanPreference;
 import com.nrg948.util.ReflectionUtil;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.wpilib.command2.Subsystem;
 
 /** Utility class for subsystem-related operations. */
 public final class SubsystemsUtil {

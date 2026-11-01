@@ -20,38 +20,6 @@ import com.nrg948.dashboard.annotations.DashboardRadialGauge;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.LabelPosition;
 import com.nrg948.sensor.RelativeEncoder;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.StructLogEntry;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotPreferences;
 import frc.robot.RobotSelector;
 import frc.robot.commands.DriveCommands;
@@ -65,6 +33,35 @@ import frc.robot.util.Gyro;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.datalog.StructLogEntry;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
+import org.wpilib.math.filter.LinearFilter;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.system.DataLogManager;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
 
 @DashboardDefinition
 public final class Swerve extends SubsystemBase implements ActiveSubsystem {
@@ -100,12 +97,12 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
       MAX_SHOOTING_DISTANCE_ANGLE_TOLERANCE - MIN_SHOOTING_DISTANCE_ANGLE_TOLERANCE;
   private static final DataLog LOG = DataLogManager.getLog();
   private static final Rotation2d ROTATE_180_DEGREES = Rotation2d.fromDegrees(180);
-  private static final SwerveModuleState SWERVE_MODULE_STATE_NEG_45 =
-      new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-  private static final SwerveModuleState SWERVE_MODULE_STATE_45 =
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-  private static final SwerveModuleState[] X_LOCK_STATES =
-      new SwerveModuleState[] {
+  private static final SwerveModuleVelocity SWERVE_MODULE_STATE_NEG_45 =
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(-45));
+  private static final SwerveModuleVelocity SWERVE_MODULE_STATE_45 =
+      new SwerveModuleVelocity(0, Rotation2d.fromDegrees(45));
+  private static final SwerveModuleVelocity[] X_LOCK_STATES =
+      new SwerveModuleVelocity[] {
         SWERVE_MODULE_STATE_45,
         SWERVE_MODULE_STATE_NEG_45,
         SWERVE_MODULE_STATE_NEG_45,
@@ -233,8 +230,6 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
           .ignoringDisable(true)
           .withName("captureLevelBaseline");
 
-  private final BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
-
   private final SwerveDriveKinematics kinematics = PARAMETERS.getKinematics();
 
   private final SwerveDrive drivetrain;
@@ -243,16 +238,14 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
   // The current sensor state updated by the periodic method.
   private double rawOrientation; // The raw gyro orientation in radians.
   private double rawOrientationOffset; // The offset to the corrected orientation in radians.
-  private Rotation2d orientation = Rotation2d.kZero;
+  private Rotation2d orientation = Rotation2d.ZERO; // The corrected orientation in radians.
   private Supplier<Optional<Rotation2d>> targetOrientationSupplier = () -> Optional.empty();
-  private double acceleration = 0;
 
   private StructLogEntry<Pose2d> poseLog =
       StructLogEntry.create(LOG, "/Swerve/Pose", Pose2d.struct);
   private DoubleLogEntry rawOrientationLog = new DoubleLogEntry(LOG, "/Swerve/rawOrientation");
   private DoubleLogEntry rawOrientationOffsetLog =
       new DoubleLogEntry(LOG, "/Swerve/rawOrientationOffset");
-  private DoubleLogEntry accelerationLog = new DoubleLogEntry(LOG, "/Swerve/acceleration");
   private StructLogEntry<Translation2d> targetLocationLog =
       StructLogEntry.create(LOG, "/Swerve/hubLocation", Translation2d.struct);
   private Translation2d vectorToTarget;
@@ -314,10 +307,6 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
     rawOrientationLog.append(Math.toDegrees(rawOrientation));
     orientation = new Rotation2d(MathUtil.angleModulus(rawOrientation + rawOrientationOffset));
 
-    double accelerationX = accelerometer.getX();
-    double accelerationY = accelerometer.getY();
-    acceleration = Math.hypot(accelerationX, accelerationY);
-    accelerationLog.append(acceleration);
     averagePitch.calculate(gyro.getPitch());
     averageRoll.calculate(gyro.getRoll());
   }
@@ -350,7 +339,7 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
 
   @Override
   public boolean isEnabled() {
-    return DriverStation.isEnabled();
+    return RobotState.isEnabled();
   }
 
   /** {@return the average pitch of the robot base in degrees} */
@@ -412,6 +401,7 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
                 orientationTarget
                     .minus(getPosition().getTranslation())
                     .getAngle()
+                    .orElse(Rotation2d.ZERO)
                     .rotateBy(ROTATE_180_DEGREES));
   }
 
@@ -455,11 +445,6 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
    */
   public static double getMaxAcceleration() {
     return PARAMETERS.getMaxDriveAcceleration();
-  }
-
-  /** Gets acceleration in g with an range of +/- 8 g's */
-  public double getAcceleration() {
-    return acceleration;
   }
 
   /**
@@ -512,23 +497,6 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
   }
 
   /**
-   * Creates a HolonomicDriveController for the subsystem.
-   *
-   * @return A HolonomicDriveController.
-   */
-  public HolonomicDriveController createDriveController() {
-    ProfiledPIDController thetaController =
-        new ProfiledPIDController(ROTATIONAL_KP, 0.0, 0.0, getRotationalConstraints());
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return new HolonomicDriveController(
-        new PIDController(DRIVE_KP, 0.0, 0.0),
-        new PIDController(DRIVE_KP, 0.0, 0.0),
-        thetaController);
-  }
-
-  /**
    * Drives the robot based on joystick inputs.
    *
    * @param xSpeed Speed of the robot in the x direction.
@@ -545,8 +513,8 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
    *
    * @param speeds The chassis speeds.
    */
-  public void setChassisSpeeds(ChassisSpeeds speeds) {
-    drivetrain.setChassisSpeeds(speeds);
+  public void setChassisVelocities(ChassisVelocities speeds) {
+    drivetrain.setChassisVelocities(speeds);
   }
 
   /**
@@ -554,11 +522,11 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
    *
    * @return The chassis speed.
    */
-  public ChassisSpeeds getChassisSpeeds() {
-    return drivetrain.getChassisSpeeds();
+  public ChassisVelocities getChassisVelocities() {
+    return drivetrain.getChassisVelocities();
   }
 
-  public SwerveModuleState[] getModuleStates() {
+  public SwerveModuleVelocity[] getModuleStates() {
     return drivetrain.getModuleStates();
   }
 
@@ -569,10 +537,10 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
   /**
    * Sets the swerve module states.
    *
-   * @param states An array of four {@link SwerveModuleState} objects in the order: front left,
+   * @param states An array of four {@link SwerveModuleVelocity} objects in the order: front left,
    *     front right, back left, back right
    */
-  public void setModuleStates(SwerveModuleState[] states) {
+  public void setModuleStates(SwerveModuleVelocity[] states) {
     drivetrain.setModuleStates(states);
   }
 
@@ -706,7 +674,7 @@ public final class Swerve extends SubsystemBase implements ActiveSubsystem {
 
     vectorToTarget = targetLocation.minus(robotLocation);
     distanceToTarget = vectorToTarget.getNorm();
-    angleToTarget = vectorToTarget.getAngle().getRadians();
+    angleToTarget = vectorToTarget.getAngle().orElse(Rotation2d.ZERO).getRadians();
 
     poseLog.append(robotPose);
     targetLocationLog.append(targetLocation);

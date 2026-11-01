@@ -9,12 +9,12 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.IntakeArm.EXTENDED_ANGLE;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.Subsystems;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
 
 /** A utility class for controlling the intake. */
 public final class IntakeCommands {

@@ -8,40 +8,40 @@
 package frc.robot.parameters;
 
 import com.nrg948.preferences.EnumPreference;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import org.wpilib.fields.Field;
+import org.wpilib.fields.Fields;
+import org.wpilib.tunable.Selectable;
 
 /**
  * AprilTag field layout selections for REBUILT.
  *
  * <p>The AprilTag location may vary depending on the field perimeter in use.
  *
- * <p>This enum can be used with a {@link SendableChooser} or {@link EnumPreference} to select the
- * field layout to match.
+ * <p>This enum can be used with a {@link Selectable} or {@link EnumPreference} to select the field
+ * layout to match.
  */
 public enum AprilTagFieldParameters {
 
   /** The field layout using the welded perimeter. */
-  k2026RebuiltWelded(AprilTagFields.k2026RebuiltWelded),
+  k2026RebuiltWelded(Fields.FRC_2026_REBUILT_WELDED),
 
   /** The field layout using the AndyMark perimeter. */
-  k2026RebuiltAndymark(AprilTagFields.k2026RebuiltAndymark);
+  k2026RebuiltAndymark(Fields.FRC_2026_REBUILT_ANDY_MARK);
 
-  private AprilTagFields aprilTagField;
+  private Fields aprilTagField;
 
   /** Constructs a variant of this enum. */
-  private AprilTagFieldParameters(AprilTagFields aprilTagField) {
+  private AprilTagFieldParameters(Fields aprilTagField) {
     this.aprilTagField = aprilTagField;
   }
 
-  /** Gets the {@link AprilTagFields} variant that can be used to load the correct field layout. */
-  public AprilTagFields getAprilTagField() {
+  /** Gets the {@link Fields} variant that can be used to load the correct field layout. */
+  public Fields getAprilTagField() {
     return aprilTagField;
   }
 
-  /** Gets the {@link AprilTagFieldLayout} for this variant. */
-  public AprilTagFieldLayout loadAprilTagFieldLayout() {
-    return AprilTagFieldLayout.loadField(aprilTagField);
+  /** Gets the {@link Field} for this variant. */
+  public Field loadAprilTagFieldLayout() {
+    return Field.loadField(aprilTagField);
   }
 }

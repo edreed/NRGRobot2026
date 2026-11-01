@@ -7,31 +7,31 @@
  
 package frc.robot.drive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import frc.robot.parameters.SwerveDriveParameters;
 import frc.robot.util.MatchUtil;
 import java.util.function.Supplier;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.drive.RobotDriveBase;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.system.DataLogManager;
 
 /** SwerveDrive implements swerve drive control. */
 public class SwerveDrive extends RobotDriveBase {
   private static final DataLog LOG = DataLogManager.getLog();
 
-  private static final ChassisSpeeds ZERO_SPEEDS = new ChassisSpeeds();
+  private static final ChassisVelocities ZERO_SPEEDS = new ChassisVelocities();
 
   private final SwerveModule[] modules;
   private final SwerveDriveKinematics kinematics;
   private final Supplier<Rotation2d> orientationSupplier;
   private final double maxDriveSpeed;
   private final double maxRotationalSpeed;
-  private final ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+  private final ChassisVelocities chassisSpeeds = new ChassisVelocities();
 
   // The current supplied state updated by the periodic method.
   private Rotation2d orientation;
@@ -40,7 +40,7 @@ public class SwerveDrive extends RobotDriveBase {
   private final DoubleLogEntry ySpeedLog = new DoubleLogEntry(LOG, "/SwerveDrive/ySpeed");
   private final DoubleLogEntry omegaSpeedLog = new DoubleLogEntry(LOG, "/SwerveDrive/omegaSpeed");
 
-  private final SwerveModuleState[] moduleStates = new SwerveModuleState[4];
+  private final SwerveModuleVelocity[] moduleStates = new SwerveModuleVelocity[4];
   private final SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
 
   /**
@@ -85,11 +85,11 @@ public class SwerveDrive extends RobotDriveBase {
   /**
    * Sets the swerve module states.
    *
-   * @param states An array of four {@link SwerveModuleState} objects in the order: front left,
+   * @param states An array of four {@link SwerveModuleVelocity} objects in the order: front left,
    *     front right, back left, back right
    */
-  public void setModuleStates(SwerveModuleState[] states) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, maxDriveSpeed);
+  public void setModuleStates(SwerveModuleVelocity[] states) {
+    states = SwerveDriveKinematics.desaturateWheelVelocities(states, maxDriveSpeed);
 
     for (int i = 0; i < modules.length; ++i) {
       modules[i].setState(states[i]);
@@ -101,10 +101,10 @@ public class SwerveDrive extends RobotDriveBase {
 
   @Override
   public void stopMotor() {
-    setChassisSpeeds(ZERO_SPEEDS);
+    setChassisVelocities(ZERO_SPEEDS);
 
     for (SwerveModule module : modules) {
-      module.stopMotors();
+      module.disable();
     }
   }
 
@@ -137,10 +137,10 @@ public class SwerveDrive extends RobotDriveBase {
     rSpeed *= m_maxOutput * maxRotationalSpeed;
 
     if (!fieldRelative) {
-      chassisSpeeds.vxMetersPerSecond = xSpeed;
-      chassisSpeeds.vyMetersPerSecond = ySpeed;
-      chassisSpeeds.omegaRadiansPerSecond = rSpeed;
-      setChassisSpeeds(chassisSpeeds);
+      chassisSpeeds.vx = xSpeed;
+      chassisSpeeds.vy = ySpeed;
+      chassisSpeeds.omega = rSpeed;
+      setChassisVelocities(chassisSpeeds);
     } else {
 
       if (MatchUtil.isRedAlliance()) {
@@ -153,11 +153,11 @@ public class SwerveDrive extends RobotDriveBase {
       double cosOrientation = Math.cos(orientationRadians);
       double sinOrientation = Math.sin(orientationRadians);
 
-      chassisSpeeds.vxMetersPerSecond = (xSpeed * cosOrientation) - (ySpeed * sinOrientation);
-      chassisSpeeds.vyMetersPerSecond = (xSpeed * sinOrientation) + (ySpeed * cosOrientation);
-      chassisSpeeds.omegaRadiansPerSecond = rSpeed;
+      chassisSpeeds.vx = (xSpeed * cosOrientation) - (ySpeed * sinOrientation);
+      chassisSpeeds.vy = (xSpeed * sinOrientation) + (ySpeed * cosOrientation);
+      chassisSpeeds.omega = rSpeed;
 
-      setChassisSpeeds(chassisSpeeds);
+      setChassisVelocities(chassisSpeeds);
     }
   }
 
@@ -166,7 +166,7 @@ public class SwerveDrive extends RobotDriveBase {
    *
    * @return The current module state.
    */
-  public SwerveModuleState[] getModuleStates() {
+  public SwerveModuleVelocity[] getModuleStates() {
     for (int i = 0; i < modules.length; i++) {
       moduleStates[i] = modules[i].getState();
     }
@@ -179,12 +179,12 @@ public class SwerveDrive extends RobotDriveBase {
    *
    * @param speeds The chassis speeds.
    */
-  public void setChassisSpeeds(ChassisSpeeds speeds) {
-    xSpeedLog.append(speeds.vxMetersPerSecond);
-    ySpeedLog.append(speeds.vyMetersPerSecond);
-    omegaSpeedLog.append(Math.toDegrees(speeds.omegaRadiansPerSecond));
+  public void setChassisVelocities(ChassisVelocities speeds) {
+    xSpeedLog.append(speeds.vx);
+    ySpeedLog.append(speeds.vy);
+    omegaSpeedLog.append(Math.toDegrees(speeds.omega));
 
-    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+    SwerveModuleVelocity[] states = kinematics.toSwerveModuleVelocities(speeds);
 
     setModuleStates(states);
   }
@@ -194,8 +194,8 @@ public class SwerveDrive extends RobotDriveBase {
    *
    * @return The chassis speed.
    */
-  public ChassisSpeeds getChassisSpeeds() {
-    return kinematics.toChassisSpeeds(getModuleStates());
+  public ChassisVelocities getChassisVelocities() {
+    return kinematics.toChassisVelocities(getModuleStates());
   }
 
   /**
@@ -220,16 +220,6 @@ public class SwerveDrive extends RobotDriveBase {
 
     for (SwerveModule module : modules) {
       module.periodic();
-    }
-  }
-
-  /**
-   * This method is called periodically by the SwerveSubsystem. It is used to update module-specific
-   * simulation state.
-   */
-  public void simulationPeriodic() {
-    for (SwerveModule module : modules) {
-      module.simulationPeriodic();
     }
   }
 }

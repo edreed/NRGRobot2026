@@ -12,9 +12,6 @@ import static frc.robot.Constants.RobotConstants.LEDSegment.STATUS_LED_COUNT;
 import static frc.robot.parameters.Colors.RED;
 import static frc.robot.util.MatchUtil.transitionTimes;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.LEDs.BlinkColor;
 import frc.robot.commands.LEDs.BlinkingRainbowCycle;
 import frc.robot.commands.LEDs.LEDCommands;
@@ -22,6 +19,9 @@ import frc.robot.commands.LEDs.RainbowCycle;
 import frc.robot.parameters.Colors;
 import frc.robot.util.MatchUtil;
 import frc.robot.util.MatchUtil.LEDLights;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Commands;
 
 /** A subsystem to control the status LEDs. */
 public final class StatusLED extends LEDSubsystem {

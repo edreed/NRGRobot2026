@@ -10,8 +10,8 @@ package frc.robot.util;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.units.measure.Angle;
 
 /** A gyro implementation based on the Pigeon 2. */
 public final class Pigeon2Gyro implements Gyro {
@@ -21,7 +21,7 @@ public final class Pigeon2Gyro implements Gyro {
   private final StatusSignal<Angle> roll;
 
   public Pigeon2Gyro(int canID) {
-    pigeon = new Pigeon2(canID, CANBus.roboRIO());
+    pigeon = new Pigeon2(canID, new CANBus(CANPort.CAN_D0));
     yaw = pigeon.getYaw();
     pitch = pigeon.getPitch();
     roll = pigeon.getRoll();
@@ -45,11 +45,6 @@ public final class Pigeon2Gyro implements Gyro {
   @Override
   public void reset() {
     pigeon.reset();
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    pigeon.initSendable(builder);
   }
 
   @Override

@@ -7,11 +7,11 @@
  
 package frc.robot.commands.LEDs;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.parameters.Colors;
 import frc.robot.subsystems.StatusLED;
 import frc.robot.subsystems.Subsystems;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
 
 /** A namespace for LED command factory methods. */
 public final class LEDCommands {

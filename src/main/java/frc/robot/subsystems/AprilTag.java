@@ -14,25 +14,6 @@ import com.nrg948.dashboard.annotations.DashboardDefinition;
 import com.nrg948.dashboard.annotations.DashboardLayout;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.preferences.EnumPreference;
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.StructArrayLogEntry;
-import edu.wpi.first.util.datalog.StructLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotPreferences;
 import frc.robot.RobotSelector;
 import frc.robot.parameters.PoseEstimationStrategy;
@@ -45,6 +26,25 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.datalog.BooleanLogEntry;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.StructArrayLogEntry;
+import org.wpilib.datalog.StructLogEntry;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.system.DataLogManager;
+import org.wpilib.system.Timer;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.vision.camera.HttpCamera;
+import org.wpilib.vision.camera.HttpCamera.HttpCameraKind;
 
 @DashboardDefinition
 public final class AprilTag extends SubsystemBase {
@@ -161,10 +161,11 @@ public final class AprilTag extends SubsystemBase {
   private final PhotonCamera camera;
   private final Transform3d cameraToRobot;
   private final Transform3d robotToCamera;
+
   private final PhotonPoseEstimator estimator;
 
   @DashboardComboBoxChooser(column = 0, row = 0, width = 2, title = "Selected April Tag")
-  private final SendableChooser<Integer> aprilTagIdChooser = new SendableChooser<>();
+  private final Selectable<Integer> aprilTagIdChooser = new Selectable<>();
 
   private final BooleanLogEntry hasTargetLogger;
   private final StructLogEntry<Pose2d> estimatedPoseLogger;
@@ -183,7 +184,7 @@ public final class AprilTag extends SubsystemBase {
 
   private Optional<EstimatedRobotPose> globalEstimatedPose = Optional.empty();
 
-  private Pose2d lastEstimatedPose = Pose2d.kZero;
+  private Pose2d lastEstimatedPose = Pose2d.ZERO;
 
   private Matrix<N3, N1> curStdDevs = SINGLE_TAG_STD_DEVS;
 
@@ -212,9 +213,9 @@ public final class AprilTag extends SubsystemBase {
     estimator = new PhotonPoseEstimator(FieldUtils.getFieldLayout(), robotToCamera);
 
     for (int i = 1; i <= 32; i++) {
-      aprilTagIdChooser.addOption(String.valueOf(i), i);
+      aprilTagIdChooser.add(String.valueOf(i), i);
     }
-    aprilTagIdChooser.setDefaultOption("1", 1);
+    aprilTagIdChooser.addDefault("1", 1);
 
     hasTargetLogger = new BooleanLogEntry(LOG, String.format("/%s/Has Target", cameraName));
     estimatedPoseLogger =
@@ -228,7 +229,7 @@ public final class AprilTag extends SubsystemBase {
         new HttpCamera(
             String.format(cameraPublisherName),
             String.format(streamURL),
-            HttpCameraKind.kMJPGStreamer);
+            HttpCameraKind.MJPG_STREAMER);
   }
 
   /**
@@ -316,8 +317,8 @@ public final class AprilTag extends SubsystemBase {
 
   /**
    * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
-   * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.
-   * This should only be used when there are targets visible.
+   * with {@link org.wpilib.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}. This
+   * should only be used when there are targets visible.
    */
   public Matrix<N3, N1> getEstimationStdDevs() {
     return curStdDevs;
@@ -393,7 +394,7 @@ public final class AprilTag extends SubsystemBase {
     // timeout period.
     if (currentResult.isPresent()
         || this.result
-            .map(r -> (Timer.getFPGATimestamp() - r.getTimestampSeconds()) < LAST_RESULT_TIMEOUT)
+            .map(r -> (Timer.getTimestamp() - r.getTimestampSeconds()) < LAST_RESULT_TIMEOUT)
             .orElse(false)) {
       this.result = currentResult;
 

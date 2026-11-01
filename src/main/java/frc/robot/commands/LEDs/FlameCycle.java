@@ -11,9 +11,9 @@ import static frc.robot.parameters.Colors.BLACK;
 import static frc.robot.parameters.Colors.RED;
 import static frc.robot.parameters.Colors.YELLOW;
 
-import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.StatusLED;
+import org.wpilib.command2.Command;
+import org.wpilib.util.Color8Bit;
 
 /** A command to display an animated flame pattern on the status LEDs. */
 public final class FlameCycle extends Command {

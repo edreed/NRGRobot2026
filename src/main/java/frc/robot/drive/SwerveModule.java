@@ -11,22 +11,18 @@ import com.nrg948.actuator.MotorController;
 import com.nrg948.dashboard.annotations.DashboardDefinition;
 import com.nrg948.dashboard.annotations.DashboardRadialGauge;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.Robot;
 import frc.robot.parameters.SwerveDriveParameters;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.system.DataLogManager;
 
 /**
  * Manages the drive and steering motors of a single swerve drive module.
@@ -50,7 +46,6 @@ public final class SwerveModule {
   private final Supplier<Rotation2d> wheelAngleSupplier;
   private final DoubleSupplier wheelAngleVelocitySupplier;
   private final String name;
-  private final double wheelDiameter;
 
   // models motors mathematically, calculates voltage needed
   private final SimpleMotorFeedforward driveFeedForward;
@@ -64,7 +59,7 @@ public final class SwerveModule {
   private double steeringVoltage;
 
   // The current supplied state updated by the periodic method.
-  private final SwerveModuleState state = new SwerveModuleState();
+  private final SwerveModuleVelocity state = new SwerveModuleVelocity();
   private final SwerveModulePosition position = new SwerveModulePosition();
 
   private final DoubleLogEntry driveSpeedLog;
@@ -75,14 +70,6 @@ public final class SwerveModule {
   private final DoubleLogEntry stateWheelAngleLog;
   private final DoubleLogEntry driveVoltageLog;
   private final DoubleLogEntry steeringVoltageLog;
-
-  // Simulation support.
-  private double simVelocity;
-  private double simPosition;
-  private Rotation2d simWheelAngle = Rotation2d.kZero;
-  private double simWheelAngleVelocity;
-  private FlywheelSim simDriveMotor;
-  private FlywheelSim simSteeringMotor;
 
   /**
    * Constructs the swerve module.
@@ -106,17 +93,13 @@ public final class SwerveModule {
       Supplier<Rotation2d> wheelAngle,
       DoubleSupplier wheelAngleVelocity,
       String name) {
-    boolean realRobot = Robot.isReal();
-
     this.driveMotor = driveMotor;
     this.steeringMotor = steeringMotor;
-    this.wheelAngleSupplier = realRobot ? wheelAngle : () -> this.simWheelAngle;
-    this.wheelAngleVelocitySupplier =
-        realRobot ? wheelAngleVelocity : () -> this.simWheelAngleVelocity;
-    this.positionSupplier = realRobot ? position : () -> this.simPosition;
-    this.velocitySupplier = realRobot ? velocity : () -> this.simVelocity;
+    this.wheelAngleSupplier = wheelAngle;
+    this.wheelAngleVelocitySupplier = wheelAngleVelocity;
+    this.positionSupplier = position;
+    this.velocitySupplier = velocity;
     this.name = name;
-    this.wheelDiameter = parameters.getModuleParameters().getWheelDiameter();
 
     this.driveSpeedLog =
         new DoubleLogEntry(LOG, String.format("/SwerveModule/%s/driveSpeed", name));
@@ -149,18 +132,6 @@ public final class SwerveModule {
     this.steeringPID.enableContinuousInput(-Math.PI, Math.PI);
     this.steeringPID.setTolerance(Math.toRadians(1.0));
     this.steeringPID.reset(getPosition().angle.getRadians());
-
-    this.simDriveMotor =
-        new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(parameters.getDriveKv(), parameters.getDriveKa()),
-            DCMotor.getFalcon500(1),
-            parameters.getModuleParameters().getDriveGearRatio());
-    this.simSteeringMotor =
-        new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                parameters.getSteeringKv(), parameters.getSteeringKa()),
-            DCMotor.getFalcon500(1),
-            parameters.getModuleParameters().getSteeringGearRatio());
   }
 
   /** Initializes the supplied state. */
@@ -180,10 +151,10 @@ public final class SwerveModule {
     double wheelAngleVelocity = wheelAngleVelocitySupplier.getAsDouble();
     double position = positionSupplier.getAsDouble();
 
-    this.position.distanceMeters = position;
+    this.position.distance = position;
     this.position.angle = wheelAngle;
 
-    this.state.speedMetersPerSecond = velocity;
+    this.state.velocity = velocity;
     this.state.angle = wheelAngle;
 
     driveSpeedLog.append(velocity);
@@ -204,19 +175,18 @@ public final class SwerveModule {
    *
    * @param newState The desired state w/ speed and angle
    */
-  public void setState(SwerveModuleState newState) {
+  public void setState(SwerveModuleVelocity newState) {
     // Optimize the state to avoid spinning further than 90 degrees
     Rotation2d currentAngle = getWheelRotation2d();
-    newState.optimize(currentAngle);
-    newState.cosineScale(currentAngle);
+    newState = newState.optimize(currentAngle);
+    newState = newState.cosineScale(currentAngle);
 
-    stateVelocityLog.append(newState.speedMetersPerSecond);
+    stateVelocityLog.append(newState.velocity);
     stateWheelAngleLog.append(newState.angle.getDegrees());
 
     // Calculate the drive motor voltage using PID and FeedForward
-    double driveOutput =
-        drivePID.calculate(state.speedMetersPerSecond, newState.speedMetersPerSecond);
-    double driveFeedForward = this.driveFeedForward.calculate(newState.speedMetersPerSecond);
+    double driveOutput = drivePID.calculate(state.velocity, newState.velocity);
+    double driveFeedForward = this.driveFeedForward.calculate(newState.velocity);
 
     // Calculate the steering motor voltage using PID and FeedForward
     double steeringOutput =
@@ -245,9 +215,9 @@ public final class SwerveModule {
   }
 
   /** Stops the drive and steering motors. */
-  public void stopMotors() {
-    driveMotor.stopMotor();
-    steeringMotor.stopMotor();
+  public void disable() {
+    driveMotor.disable();
+    steeringMotor.disable();
   }
 
   /**
@@ -255,7 +225,7 @@ public final class SwerveModule {
    *
    * @return The current module state.
    */
-  public SwerveModuleState getState() {
+  public SwerveModuleVelocity getState() {
     return state;
   }
 
@@ -285,25 +255,6 @@ public final class SwerveModule {
     updateSuppliedState();
   }
 
-  /**
-   * This method is called periodically by the {@link Swerve}. It is used to update module-specific
-   * simulation state.
-   */
-  public void simulationPeriodic() {
-    simDriveMotor.setInputVoltage(driveVoltage);
-    simSteeringMotor.setInputVoltage(steeringVoltage);
-
-    simDriveMotor.update(Robot.kDefaultPeriod);
-    simSteeringMotor.update(Robot.kDefaultPeriod);
-
-    simVelocity = (simDriveMotor.getAngularVelocityRadPerSec() * wheelDiameter) / 2;
-    simPosition += simVelocity * Robot.kDefaultPeriod;
-
-    simWheelAngleVelocity = simSteeringMotor.getAngularVelocityRadPerSec();
-    simWheelAngle =
-        new Rotation2d(simWheelAngle.getRadians() + (simWheelAngleVelocity * Robot.kDefaultPeriod));
-  }
-
   /** Returns the wheel angle in degrees. */
   @DashboardRadialGauge(
       title = "Wheel Angle (deg)",
@@ -320,6 +271,6 @@ public final class SwerveModule {
   /** Returns the wheel velocity in meters per second. */
   @DashboardTextDisplay(title = "Wheel Velocity (m/s)")
   public double getVelocity() {
-    return getState().speedMetersPerSecond;
+    return getState().velocity;
   }
 }

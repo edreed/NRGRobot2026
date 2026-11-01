@@ -9,10 +9,10 @@ package frc.robot.commands.LEDs;
 
 import static frc.robot.parameters.Colors.BLACK;
 
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.StatusLED;
+import org.wpilib.command2.Command;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
 
 /** A command to display an animated rainbow cycle pattern on the status LEDs. */
 public final class RainbowCycle extends Command {

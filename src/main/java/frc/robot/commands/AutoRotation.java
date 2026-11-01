@@ -9,8 +9,8 @@ package frc.robot.commands;
 
 import com.nrg948.dashboard.annotations.DashboardPIDController;
 import com.nrg948.preferences.ProfiledPIDControllerPreference;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
+import org.wpilib.command2.Command;
 
 /** A command that enables the driver to drive the robot using an Xbox controller. */
 public class AutoRotation extends Command {

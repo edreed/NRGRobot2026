@@ -17,13 +17,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
 import frc.robot.parameters.AutoSide;
 import frc.robot.subsystems.IntakeArm;
@@ -40,6 +33,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.system.Filesystem;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.util.Alert;
+import org.wpilib.util.Alert.Level;
 
 /** A utility class for autonomous related commands and selection. */
 public final class Autos {
@@ -49,13 +49,13 @@ public final class Autos {
 
   private static final HashMap<Pair<String, AutoSide>, Command> autosMap = new HashMap<>();
 
-  private static final SendableChooser<AutoSide> sideChooser =
-      EnumChooser.fromDefault(AutoSide.RIGHT);
-  private static SendableChooser<Command> autoChooser;
-  private static final SendableChooser<Integer> delayChooser = new SendableChooser<>();
+  private static final Selectable<AutoSide> sideChooser = EnumChooser.fromDefault(AutoSide.RIGHT);
+  private static Selectable<Command> autoChooser;
+  private static final Selectable<Integer> delayChooser = new Selectable<>();
 
   private static final Alert invalidAutoAlert =
-      new Alert("Invalid auto combination. No auto will run.", AlertType.kError);
+      new Alert(
+          "Invalid Auto Selection", "Invalid auto combination. No auto will run.", Level.HIGH);
 
   /**
    * Initializes the autonomous command selection and configuration. This should be called in {@link
@@ -71,8 +71,8 @@ public final class Autos {
     AutoBuilder.configure(
         drivetrain::getPosition,
         drivetrain::resetPosition,
-        drivetrain::getChassisSpeeds,
-        drivetrain::setChassisSpeeds,
+        drivetrain::getChassisVelocities,
+        drivetrain::setChassisVelocities,
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         config,
@@ -83,9 +83,9 @@ public final class Autos {
     autoChooser.onChange(Autos::preloadAuto);
     sideChooser.onChange(Autos::preloadAuto);
 
-    delayChooser.setDefaultOption("No Delay", (Integer) 0);
+    delayChooser.addDefault("No Delay", (Integer) 0);
     for (var i = 1; i < 8; i++) {
-      delayChooser.addOption(String.format("%d Second Delay", i), (Integer) i);
+      delayChooser.add(String.format("%d Second Delay", i), (Integer) i);
     }
   }
 
@@ -277,18 +277,18 @@ public final class Autos {
     return autoChooser.getSelected();
   }
 
-  /** {@return the {@link SendableChooser} for selecting the autonomous command} */
-  public static SendableChooser<Command> getAutoChooser() {
+  /** {@return the {@link Selectable} for selecting the autonomous command} */
+  public static Selectable<Command> getAutoChooser() {
     return autoChooser;
   }
 
-  /** {@return the {@link SendableChooser} for selecting the autonomous path starting side} */
-  public static SendableChooser<AutoSide> getSideChooser() {
+  /** {@return the {@link Selectable} for selecting the autonomous path starting side} */
+  public static Selectable<AutoSide> getSideChooser() {
     return sideChooser;
   }
 
-  /** {@return the {@link SendableChooser} for selecting the delay at the start of autonomous} */
-  public static SendableChooser<Integer> getDelayChooser() {
+  /** {@return the {@link Selectable} for selecting the delay at the start of autonomous} */
+  public static Selectable<Integer> getDelayChooser() {
     return delayChooser;
   }
 

@@ -33,14 +33,15 @@ import com.nrg948.dashboard.annotations.DashboardRadialGauge;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.DataBinding;
 import com.nrg948.sensor.RelativeEncoder;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
+import org.wpilib.math.util.Units;
+import org.wpilib.system.DataLogManager;
 
 @DashboardDefinition
 public final class Shooter extends SubsystemBase implements ActiveSubsystem {
@@ -167,14 +168,14 @@ public final class Shooter extends SubsystemBase implements ActiveSubsystem {
     try {
       leftUpperMotor =
           SHOOTER_MOTOR
-              .newController("/Shooter/Left Upper Motor", SHOOTER_UPPER_LEFT_ID)
+              .newController("/Shooter/Left Upper Motor", CANPort.CAN_D0, SHOOTER_UPPER_LEFT_ID)
               .apply(LEFT_MOTOR_CONFIG)
               .apply(CURRENT_CONFIG);
       leftLowerMotor =
           leftUpperMotor.createFollower("/Shooter/Left Lower Motor", SHOOTER_LOWER_LEFT_ID, false);
       rightUpperMotor =
           SHOOTER_MOTOR
-              .newController("/Shooter/Right Upper Motor", SHOOTER_UPPER_RIGHT_ID)
+              .newController("/Shooter/Right Upper Motor", CANPort.CAN_D0, SHOOTER_UPPER_RIGHT_ID)
               .apply(RIGHT_MOTOR_CONFIG)
               .apply(CURRENT_CONFIG);
       rightLowerMotor =
@@ -256,8 +257,8 @@ public final class Shooter extends SubsystemBase implements ActiveSubsystem {
         rightUpperTalonFx.setControl(motionMagicVelocityRequest.withVelocity(goalRPS).withSlot(0));
       }
     } else {
-      leftUpperMotor.stopMotor();
-      rightUpperMotor.stopMotor();
+      leftUpperMotor.disable();
+      rightUpperMotor.disable();
     }
   }
 
@@ -275,8 +276,8 @@ public final class Shooter extends SubsystemBase implements ActiveSubsystem {
   public void disable() {
     goalVelocity = 0;
     logGoalVelocity.append(0);
-    leftUpperMotor.stopMotor();
-    rightUpperMotor.stopMotor();
+    leftUpperMotor.disable();
+    rightUpperMotor.disable();
   }
 
   @Override

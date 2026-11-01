@@ -26,13 +26,14 @@ import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.DataBinding;
 import com.nrg948.preferences.PIDControllerPreference;
 import com.nrg948.sensor.RelativeEncoder;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.datalog.DoubleLogEntry;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.system.DataLogManager;
 
 @DashboardDefinition
 public final class Rollers extends SubsystemBase implements ActiveSubsystem {
@@ -110,7 +111,9 @@ public final class Rollers extends SubsystemBase implements ActiveSubsystem {
     KV = (MAX_BATTERY_VOLTAGE - KS) / maxVelocity;
     feedforward = new SimpleMotorFeedforward(KS, KV);
     var motorConfig = new MotorConfig(CLOCKWISE_POSITIVE, COAST, metersPerRevolution);
-    motor = MOTOR.newController("/" + name + "/Motor", motorId, motorConfig, currentConfig);
+    motor =
+        MOTOR.newController(
+            "/" + name + "/Motor", CANPort.CAN_D0, motorId, motorConfig, currentConfig);
     encoder = motor.getEncoder();
     pidController = new PIDControllerPreference(name, "PID Controller", 1, 0, 0);
 
@@ -136,7 +139,7 @@ public final class Rollers extends SubsystemBase implements ActiveSubsystem {
   @Override
   public void disable() {
     goalVelocity = 0;
-    motor.stopMotor();
+    motor.disable();
   }
 
   @Override

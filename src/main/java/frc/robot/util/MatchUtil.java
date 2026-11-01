@@ -7,9 +7,11 @@
  
 package frc.robot.util;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.HashMap;
+import java.util.Optional;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 
 /** Utility class for match-related information and timing. */
 public final class MatchUtil {
@@ -101,17 +103,17 @@ public final class MatchUtil {
 
   /** {@return the alliance the robot is on} */
   public static Alliance getAlliance() {
-    return DriverStation.getAlliance().orElse(Alliance.Blue);
+    return MatchState.getAlliance().orElse(Alliance.BLUE);
   }
 
   /** {@return true if the robot is on the red alliance, false otherwise} */
   public static boolean isRedAlliance() {
-    return getAlliance() == Alliance.Red;
+    return getAlliance() == Alliance.RED;
   }
 
   /** {@return the remaining time, in seconds, in the current phase of the match} */
   public static double getMatchTimeRemaining() {
-    return DriverStation.getMatchTime();
+    return MatchState.getMatchTime();
   }
 
   /** {@return The remaining time in the current shift} */
@@ -123,25 +125,25 @@ public final class MatchUtil {
 
   /** {@return true if the robot is in teleoperated mode} */
   public static boolean isTeleop() {
-    return DriverStation.isTeleop() && DriverStation.isEnabled();
+    return RobotState.isTeleop() && RobotState.isEnabled();
   }
 
   /** {@return true if the robot is in autonomous mode} */
   public static boolean isAutonomous() {
-    return DriverStation.isAutonomous() && DriverStation.isEnabled();
+    return RobotState.isAutonomous() && RobotState.isEnabled();
   }
 
   /** {@return true if our alliance hub is active first} */
   public static boolean ourAllianceHubIsActiveFirst() {
-    String gameData = DriverStation.getGameSpecificMessage();
+    Optional<String> gameData = MatchState.getGameData();
     Alliance alliance = getAlliance();
 
-    if (gameData.length() > 0) {
-      switch (gameData.charAt(0)) {
+    if (gameData.isPresent() && gameData.get().length() > 0) {
+      switch (gameData.get().charAt(0)) {
         case 'B':
-          return alliance == Alliance.Blue;
+          return alliance == Alliance.BLUE;
         case 'R':
-          return alliance == Alliance.Red;
+          return alliance == Alliance.RED;
         default:
           break;
       }
@@ -156,18 +158,18 @@ public final class MatchUtil {
    */
   public static boolean isHubActive() {
     // Hub is always enabled in autonomous.
-    if (DriverStation.isAutonomousEnabled()) {
+    if (RobotState.isAutonomousEnabled()) {
       return true;
     }
 
     // At this point, if we're not teleop enabled, there is no hub.
-    if (!DriverStation.isTeleopEnabled()) {
+    if (!RobotState.isTeleopEnabled()) {
       return false;
     }
 
     // We're teleop enabled, compute.
-    double matchTime = DriverStation.getMatchTime();
-    String gameData = DriverStation.getGameSpecificMessage();
+    double matchTime = MatchState.getMatchTime();
+    Optional<String> gameData = MatchState.getGameData();
     // If we have no game data, we cannot compute, assume hub is active, as its
     // likely early in teleop.
     if (gameData.isEmpty()) {
@@ -179,8 +181,8 @@ public final class MatchUtil {
 
   public static boolean isGoodScoringTime() {
     // We're teleop enabled, compute.
-    double matchTime = DriverStation.getMatchTime();
-    String gameData = DriverStation.getGameSpecificMessage();
+    double matchTime = MatchState.getMatchTime();
+    Optional<String> gameData = MatchState.getGameData();
     // If we have no game data, we cannot compute, assume hub is active, as its
     // likely early in teleop.
     if (gameData.isEmpty()) {

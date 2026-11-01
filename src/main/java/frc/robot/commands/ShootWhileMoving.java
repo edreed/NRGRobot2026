@@ -9,11 +9,11 @@ package frc.robot.commands;
 
 import com.nrg948.dashboard.annotations.DashboardPIDController;
 import com.nrg948.preferences.ProfiledPIDControllerPreference;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.math.geometry.Translation2d;
 
 /** A command that enables the driver to drive the robot using an Xbox controller. */
 public class ShootWhileMoving extends DriveUsingController {
@@ -46,8 +46,7 @@ public class ShootWhileMoving extends DriveUsingController {
   private double calculateRotationSpeed(ProfiledPIDControllerPreference controller) {
     Translation2d robotVelocity =
         new Translation2d(
-                drivetrain.getChassisSpeeds().vxMetersPerSecond,
-                drivetrain.getChassisSpeeds().vyMetersPerSecond)
+                drivetrain.getChassisVelocities().vx, drivetrain.getChassisVelocities().vy)
             .rotateBy(drivetrain.getOrientation().unaryMinus());
 
     Translation2d shooterVelocityStill =

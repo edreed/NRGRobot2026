@@ -7,10 +7,10 @@
  
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.parameters.Colors;
 import frc.robot.util.LEDSegment;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.util.Color8Bit;
 
 public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */

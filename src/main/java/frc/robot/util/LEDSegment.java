@@ -9,11 +9,11 @@ package frc.robot.util;
 
 import static frc.robot.Constants.RobotConstants.LED_COUNT;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.parameters.Colors;
+import org.wpilib.hardware.led.AddressableLED;
+import org.wpilib.hardware.led.AddressableLEDBuffer;
+import org.wpilib.util.Color8Bit;
 
 /** A class representing a subsegment of an LED strip. */
 public final class LEDSegment {
@@ -57,7 +57,6 @@ public final class LEDSegment {
     AddressableLED led = new AddressableLED(RobotConstants.PWMPort.LED);
     led.setLength(LED_COUNT);
     led.setData(buffer);
-    led.start();
     return led;
   }
 

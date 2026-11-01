@@ -31,14 +31,15 @@ import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.DataBinding;
 import com.nrg948.preferences.PIDControllerPreference;
 import com.nrg948.sensor.RelativeEncoder;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotPreferences;
 import frc.robot.RobotSelector;
 import java.util.Map;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.util.Units;
 
 @DashboardDefinition
 public final class Intake extends SubsystemBase implements ActiveSubsystem {
@@ -63,7 +64,7 @@ public final class Intake extends SubsystemBase implements ActiveSubsystem {
   private static final double MAX_VELOCITY = MOTOR.getFreeSpeedRPM() * METERS_PER_REVOLUTION / 60.0;
 
   private final MotorController motor =
-      MOTOR.newController("/Intake/Motor", INTAKE_ID, MOTOR_CONFIG, CURRENT_CONFIG);
+      MOTOR.newController("/Intake/Motor", CANPort.CAN_D0, INTAKE_ID, MOTOR_CONFIG, CURRENT_CONFIG);
 
   @SuppressWarnings("unused")
   private final MotorController follower;
@@ -159,7 +160,7 @@ public final class Intake extends SubsystemBase implements ActiveSubsystem {
   @Override
   public void disable() {
     goalVelocity = 0;
-    motor.stopMotor();
+    motor.disable();
   }
 
   @Override
@@ -183,7 +184,7 @@ public final class Intake extends SubsystemBase implements ActiveSubsystem {
       motor.setVoltage(voltage);
 
     } else {
-      motor.stopMotor();
+      motor.disable();
     }
   }
 

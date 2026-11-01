@@ -21,15 +21,6 @@ import static frc.robot.subsystems.IntakeArm.STOW_ANGLE;
 
 import com.nrg948.dashboard.annotations.DashboardTab;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveAutoRotation;
@@ -44,6 +35,15 @@ import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.MatchUtil;
 import java.util.function.BooleanSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.ProxyCommand;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.datalog.BooleanLogEntry;
+import org.wpilib.datalog.DataLog;
+import org.wpilib.system.DataLogManager;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -80,7 +80,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    DriverStation.silenceJoystickConnectionWarning(true);
     Autos.init(subsystems);
 
     operator = new RobotOperator(subsystems, driverController, manipulatorController);
@@ -97,17 +96,16 @@ public class RobotContainer {
     configureBindings();
 
     RobotContainerDashboardTabs.bind(this);
-    FollowPathCommand.warmupCommand().schedule();
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
   }
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
+   * predicate, or via the named factories in {@link org.wpilib.command2.button.CommandGenericHID}'s
+   * subclasses for {@link CommandXboxController Xbox}/{@link
+   * org.wpilib.command2.button.CommandPS4Controller PS4} controllers or {@link
+   * org.wpilib.command2.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
     Swerve drivetrain = subsystems.drivetrain;
@@ -139,14 +137,14 @@ public class RobotContainer {
                 .withName("AutoAlignAndShootWithXLock"));
 
     driverController
-        .povUp()
+        .dpadUp()
         .whileTrue(
             Commands.parallel(
                     Commands.run(drivetrain::setXLock, drivetrain),
                     ShootingCommands.shootFromHub(subsystems))
                 .withName("ManualShootFromHub"));
     driverController
-        .povDown()
+        .dpadDown()
         .whileTrue(
             Commands.parallel(
                     Commands.run(drivetrain::setXLock, drivetrain),
@@ -158,16 +156,16 @@ public class RobotContainer {
     driverController.rightBumper().whileTrue(extendAndIntakeWhenSafe(subsystems));
     driverController.leftBumper().whileTrue(IntakeCommands.outtake(subsystems));
 
-    driverController.start().onTrue(DriveCommands.resetOrientation(subsystems));
+    driverController.menu().onTrue(DriveCommands.resetOrientation(subsystems));
 
     manipulatorController
-        .povUp()
+        .dpadUp()
         .whileTrue(avoidConflicts(rampUpShooterForHub(subsystems), this::isDriverUsingShooter));
-    manipulatorController.povDown().onTrue(moveArmToAngle(subsystems, HALF_STOW_ANGLE));
+    manipulatorController.dpadDown().onTrue(moveArmToAngle(subsystems, HALF_STOW_ANGLE));
 
-    manipulatorController.povLeft().whileTrue(IntakeCommands.intake(subsystems));
+    manipulatorController.dpadLeft().whileTrue(IntakeCommands.intake(subsystems));
     manipulatorController
-        .povRight()
+        .dpadRight()
         .whileTrue(avoidConflicts(rampUpShooter(subsystems), this::isDriverUsingShooter));
 
     manipulatorController
@@ -182,7 +180,7 @@ public class RobotContainer {
 
     manipulatorController.leftBumper().whileTrue(IndexerCommands.feed(subsystems));
 
-    manipulatorController.back().onTrue(DriveCommands.interruptAll(subsystems));
+    manipulatorController.view().onTrue(DriveCommands.interruptAll(subsystems));
   }
 
   /**
@@ -202,8 +200,8 @@ public class RobotContainer {
     return driverController.a().getAsBoolean()
         || driverController.b().getAsBoolean()
         || driverController.x().getAsBoolean()
-        || driverController.povUp().getAsBoolean()
-        || driverController.povDown().getAsBoolean();
+        || driverController.dpadUp().getAsBoolean()
+        || driverController.dpadDown().getAsBoolean();
   }
 
   private boolean isDriverUsingIntakeArm() {
@@ -244,7 +242,7 @@ public class RobotContainer {
     subsystems.periodic();
     operator.periodic();
 
-    logDriverConnected.update(driverController.isConnected());
-    logManipConnected.update(manipulatorController.isConnected());
+    logDriverConnected.update(driverController.getController().isConnected());
+    logManipConnected.update(manipulatorController.getController().isConnected());
   }
 }

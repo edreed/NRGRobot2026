@@ -7,8 +7,8 @@
  
 package frc.robot.util;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import org.wpilib.hardware.rotation.DutyCycleEncoder;
+import org.wpilib.math.util.MathUtil;
 
 /**
  * An adapter for the <a href="https://www.revrobotics.com/rev-11-1271/">Rev Throughbore Encoder</a>

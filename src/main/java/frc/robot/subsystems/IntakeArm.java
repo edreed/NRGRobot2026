@@ -13,6 +13,7 @@ import static frc.robot.Constants.RobotConstants.CANID.INTAKE_ARM_ID;
 import static frc.robot.Constants.RobotConstants.MAX_BATTERY_VOLTAGE;
 import static frc.robot.RobotPreferences.isCompBot;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -39,14 +40,14 @@ import com.nrg948.dashboard.annotations.DashboardRadialGauge;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.DataBinding;
 import com.nrg948.sensor.RelativeEncoder;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotPreferences;
 import frc.robot.RobotSelector;
 import java.util.Map;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.util.Units;
 
 @DashboardDefinition
 public final class IntakeArm extends SubsystemBase implements ActiveSubsystem {
@@ -80,7 +81,7 @@ public final class IntakeArm extends SubsystemBase implements ActiveSubsystem {
   public static final double MIN_ANGLE = Units.degreesToRadians(0);
   public static final double MAX_ANGLE = STOW_ANGLE;
 
-  private final TalonFX talonFX = new TalonFX(INTAKE_ARM_ID);
+  private final TalonFX talonFX = new TalonFX(INTAKE_ARM_ID, new CANBus(CANPort.CAN_D0));
   private MotorController motor;
 
   private final RelativeEncoder encoder;
@@ -194,7 +195,7 @@ public final class IntakeArm extends SubsystemBase implements ActiveSubsystem {
    * @param angle angle in radians
    */
   public void setGoalAngle(double angle) {
-    angle = MathUtil.clamp(angle, MIN_ANGLE, MAX_ANGLE);
+    angle = Math.clamp(angle, MIN_ANGLE, MAX_ANGLE);
     goalAngle = angle;
     enabled = true;
 

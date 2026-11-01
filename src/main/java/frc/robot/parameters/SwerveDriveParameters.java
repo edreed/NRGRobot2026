@@ -13,6 +13,7 @@ import static com.nrg948.actuator.Motors.KrakenX44;
 import static com.nrg948.actuator.Motors.KrakenX60;
 import static frc.robot.parameters.SwerveModuleParameters.MK4I_L2;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -23,14 +24,15 @@ import com.nrg948.actuator.MotorDirection;
 import com.nrg948.actuator.Motors;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
-import edu.wpi.first.math.util.Units;
 import frc.robot.util.Gyro;
 import frc.robot.util.Pigeon2Gyro;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import org.wpilib.math.util.Units;
 
 /** An enum representing the properties for the swerve drive base of a specific robot instance. */
 public enum SwerveDriveParameters {
@@ -515,14 +517,15 @@ public enum SwerveDriveParameters {
         double metersPerRotation = (getWheelDiameter() * Math.PI) / getDriveGearRatio();
         motorConfig = new MotorConfig(COUNTER_CLOCKWISE_POSITIVE, BRAKE, metersPerRotation);
 
-        return driveMotor.newController(logPrefix, motorID, motorConfig, DRIVE_CURRENT_CONFIG);
+        return driveMotor.newController(
+            logPrefix, CANPort.CAN_D0, motorID, motorConfig, DRIVE_CURRENT_CONFIG);
 
       default:
         double radiansPerRotation = (2 * Math.PI) / getSteeringGearRatio();
         motorConfig = new MotorConfig(getSteeringDirection(), BRAKE, radiansPerRotation);
 
         return steeringMotor.newController(
-            logPrefix, motorID, motorConfig, STEERING_CURRENT_CONFIG);
+            logPrefix, CANPort.CAN_D0, motorID, motorConfig, STEERING_CURRENT_CONFIG);
     }
   }
 
@@ -553,7 +556,7 @@ public enum SwerveDriveParameters {
    */
   public CANcoder getAngleEncoder(SwerveAngleEncoder angleEncoder) {
     int deviceID = getAngleEncoderId(angleEncoder);
-    CANcoder wheelAngleEncoder = new CANcoder(deviceID);
+    CANcoder wheelAngleEncoder = new CANcoder(deviceID, new CANBus(CANPort.CAN_D0));
     CANcoderConfigurator wheelAngleConfigurator = wheelAngleEncoder.getConfigurator();
     CANcoderConfiguration wheelAngleConfig = new CANcoderConfiguration();
 

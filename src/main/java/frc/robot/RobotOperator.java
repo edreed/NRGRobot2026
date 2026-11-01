@@ -20,13 +20,6 @@ import com.nrg948.dashboard.annotations.DashboardSplitButtonChooser;
 import com.nrg948.dashboard.annotations.DashboardTextDisplay;
 import com.nrg948.dashboard.model.GameField;
 import com.nrg948.util.Colors;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.Autos;
 import frc.robot.parameters.AutoSide;
 import frc.robot.subsystems.AprilTag;
@@ -37,6 +30,13 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.HubState;
 import frc.robot.util.MatchUtil;
 import java.util.Optional;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.smartdashboard.Field2d;
+import org.wpilib.system.Timer;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.util.Alert;
 
 @DashboardDefinition
 public final class RobotOperator {
@@ -62,7 +62,7 @@ public final class RobotOperator {
       row = 2,
       width = 3,
       height = 1)
-  public final SendableChooser<AutoSide> sideChooser = Autos.getSideChooser();
+  public final Selectable<AutoSide> sideChooser = Autos.getSideChooser();
 
   @DashboardComboBoxChooser(
       title = "Autonomous Routine",
@@ -70,10 +70,10 @@ public final class RobotOperator {
       row = 3,
       width = 3,
       height = 1)
-  private final SendableChooser<Command> autoChooser = Autos.getAutoChooser();
+  private final Selectable<Command> autoChooser = Autos.getAutoChooser();
 
   @DashboardComboBoxChooser(title = "Autonomous Delay", column = 9, row = 4, width = 3, height = 1)
-  private final SendableChooser<Integer> delayChooser = Autos.getDelayChooser();
+  private final Selectable<Integer> delayChooser = Autos.getDelayChooser();
 
   @DashboardAlerts(title = "Alerts", column = 0, row = 3, width = 3, height = 2)
   private final Alert[] alerts = new Alert[] {Autos.getInvalidAutoAlert()};
@@ -306,11 +306,11 @@ public final class RobotOperator {
 
   @DashboardBooleanBox(title = "Driver", column = 7, row = 2, height = 1, width = 1)
   public boolean isDriverConnected() {
-    return driver.isConnected();
+    return driver.getController().isConnected();
   }
 
   @DashboardBooleanBox(title = "Manip", column = 8, row = 2, height = 1, width = 1)
   public boolean isManipulatorConnected() {
-    return manipulator.isConnected();
+    return manipulator.getController().isConnected();
   }
 }

@@ -12,11 +12,6 @@ import static frc.robot.RobotPreferences.isCompBot;
 import com.nrg948.actuator.MotorCurrentConfig;
 import com.nrg948.actuator.MotorIdleMode;
 import com.nrg948.dashboard.annotations.DashboardTab;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.StringLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.RobotConstants.CANID;
 import frc.robot.RobotPreferences;
 import java.util.ArrayList;
@@ -24,6 +19,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.datalog.StringLogEntry;
+import org.wpilib.math.util.Units;
+import org.wpilib.system.DataLogManager;
 
 public final class Subsystems {
 

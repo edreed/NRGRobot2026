@@ -9,7 +9,7 @@ package frc.robot;
 
 import static frc.robot.RobotPreferences.isCompBot;
 
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

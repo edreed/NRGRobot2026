@@ -7,10 +7,11 @@
  
 package frc.robot.util;
 
-import edu.wpi.first.util.sendable.Sendable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableTable;
 
 /** An interface for a sensor that provides rotational positioning. */
-public interface Gyro extends Sendable, AutoCloseable {
+public interface Gyro extends ComplexTunable, AutoCloseable {
   /** {@return the gyro yaw angle in radians} Positive values in the counter-clockwise direction. */
   double getYaw();
 
@@ -22,4 +23,17 @@ public interface Gyro extends Sendable, AutoCloseable {
 
   /** Resets the gyro to 0. */
   void reset();
+
+  /** {@return the type of the tunable} */
+  @Override
+  default String getTunableType() {
+    return "Gyro";
+  }
+
+  @Override
+  default void publishTunable(TunableTable table) {
+    table.publishDouble("Value", this::getYaw, null);
+    table.publishDouble("Pitch", this::getPitch, null);
+    table.publishDouble("Roll", this::getRoll, null);
+  }
 }

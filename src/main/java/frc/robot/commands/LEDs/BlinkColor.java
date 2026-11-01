@@ -9,10 +9,10 @@ package frc.robot.commands.LEDs;
 
 import static frc.robot.parameters.Colors.BLACK;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.parameters.Colors;
 import frc.robot.subsystems.LEDSubsystem;
+import org.wpilib.command2.Command;
+import org.wpilib.system.Timer;
 
 /** A command to blink the status LEDs a specified color. */
 public final class BlinkColor extends Command {
